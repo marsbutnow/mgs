@@ -1204,6 +1204,107 @@ window.addEventListener('load', () => {
     setTimeout(()=>l.remove(), 600);
   }, 1400);
 });
+  // ═══════════════════════════════════════════════════════
+//  DRIVE PREFETCH PATCH — paste at end of <script>, before </script>
+//  Rewrites every openGame call to fetch Drive HTML and inject
+//  into about:blank, including Ruffle/Flash games.
+// ═══════════════════════════════════════════════════════
+
+function getFileId(url) {
+  const m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  return m ? m[1] : null;
+}
+
+function fetchAndLaunch(url, name, type) {
+  const fileId = getFileId(url);
+  if (!fileId) { launchInWindow(url, name); return; }
+
+  const directURL = `https://drive.google.com/uc?export=download&id=${fileId}&confirm=t&t=${Date.now()}`;
+  showToast('Fetching ' + name + '...');
+
+  fetch(directURL)
+    .then(r => {
+      if (!r.ok) throw new Error(r.status);
+      // For Flash/Ruffle: get as ArrayBuffer so binary data is intact
+      if (type === 'flash') return r.arrayBuffer().then(buf => ({ buf, isFlash: true }));
+      return r.text().then(text => ({ text, isFlash: false }));
+    })
+    .then(result => {
+      const newWin = window.open('about:blank', '_blank');
+      if (!newWin) { alert('Allow popups to play games!'); return; }
+
+      if (result.isFlash) {
+        // Inject Ruffle + serve the .swf via a blob URL
+        const swfBlob = new Blob([result.buf], { type: 'application/x-shockwave-flash' });
+        const swfURL  = URL.createObjectURL(swfBlob);
+
+        newWin.document.open();
+        newWin.document.write(`<!DOCTYPE html><html><head>
+          <title>${name}</title>
+          <script src="https://unpkg.com/@ruffle-rs/ruffle"><\/script>
+          <style>*{margin:0;padding:0;box-sizing:border-box}
+          body{background:#000;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+          #bar{background:#111;border-bottom:1px solid #222;padding:6px 12px;display:flex;
+               align-items:center;font-family:monospace;font-size:12px;color:#555;flex-shrink:0}
+          #bar span{color:#e63946;font-weight:bold;flex:1}
+          button{background:#e63946;border:none;color:#fff;font-size:11px;
+                 padding:4px 10px;cursor:pointer;font-family:monospace}
+          ruffle-player{flex:1;width:100%;display:block}</style>
+        </head><body>
+          <div id="bar"><span>▶ ${name}</span>
+            <button onclick="window.close()">✕ CLOSE</button></div>
+          <script>
+            window.addEventListener('load', () => {
+              const ruffle = window.RufflePlayer.newest();
+              const player = ruffle.createPlayer();
+              player.style.flex = '1';
+              player.style.width = '100%';
+              document.body.appendChild(player);
+              player.load('${swfURL}');
+            });
+          <\/script>
+        </body></html>`);
+        newWin.document.close();
+
+      } else {
+        // HTML5 / single-file game — write raw HTML directly
+        newWin.document.open();
+        newWin.document.write(result.text);
+        newWin.document.close();
+        try { newWin.document.title = name; } catch(e) {}
+      }
+
+      showToast(name + ' launched!');
+    })
+    .catch(err => {
+      console.warn('fetchAndLaunch failed:', err);
+      showToast('Falling back to preview...');
+      // Fallback: Drive preview embed in a clean window
+      const newWin = window.open('about:blank', '_blank');
+      if (!newWin) return;
+      const fileId2 = getFileId(url);
+      newWin.document.open();
+      newWin.document.write(`<!DOCTYPE html><html><head><title>${name}</title>
+        <style>*{margin:0;padding:0}body{background:#000;display:flex;flex-direction:column;height:100vh}
+        #bar{background:#111;padding:6px 12px;display:flex;align-items:center;font-family:monospace;font-size:12px;color:#555;flex-shrink:0}
+        #bar span{color:#e63946;font-weight:bold;flex:1}button{background:#e63946;border:none;color:#fff;padding:4px 10px;cursor:pointer;font-family:monospace}
+        iframe{flex:1;border:none}</style></head><body>
+        <div id="bar"><span>▶ ${name}</span><button onclick="window.close()">✕ CLOSE</button></div>
+        <iframe src="https://drive.google.com/file/d/${fileId2}/preview" allowfullscreen></iframe>
+        </body></html>`);
+      newWin.document.close();
+    });
+}
+
+// ── Patch: override openGame to always use fetchAndLaunch for Drive URLs ──
+const _originalOpenGame = openGame;
+window.openGame = function(url, name, type) {
+  if (url.includes('drive.google.com')) {
+    fetchAndLaunch(url, name, type);
+  } else {
+    _originalOpenGame(url, name, type);
+  }
+};
 </script>
 </body>
 </html>
