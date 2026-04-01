@@ -2,1411 +2,623 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Mars Game Stash</title>
-<!-- Ruffle Flash Emulator -->
-<script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@400;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap');
+/* ── THEMES ── */
+:root{
+  --a:#00d4ff;--a2:#e63946;--bg:#07090f;--bg2:#0d1220;
+  --card:#111827;--text:#c8d6e5;--dim:#3a5a7a;--border:#1a2a40;
+  --glow:rgba(0,212,255,.55);
+}
+.theme-pink{--a:#ff69b4;--a2:#ff1493;--glow:rgba(255,105,180,.6);--bg:#100010;--bg2:#1a0015;--card:#1f0018;--border:#4a0035;--dim:#8a3060;}
+.theme-maroon{--a:#cc2222;--a2:#ff6666;--glow:rgba(200,34,34,.6);--bg:#0f0000;--bg2:#1a0000;--card:#220000;--border:#440000;--dim:#883333;}
+.theme-hacker{--a:#00ff00;--a2:#33ff33;--glow:rgba(0,255,0,.55);--bg:#000;--bg2:#010f01;--card:#001400;--border:#004000;--dim:#006600;}
+.theme-choco{--a:#c8853a;--a2:#f0c080;--glow:rgba(200,133,58,.55);--bg:#1a0f05;--bg2:#261507;--card:#321c09;--border:#5a3010;--dim:#9a7040;}
+.theme-rainbow{--a:#ff0080;--a2:#00ffcc;--glow:rgba(255,0,128,.55);--bg:#0a0a0a;--bg2:#111;--card:#151515;--border:#222;--dim:#555;}
+.theme-light{--a:#0077cc;--a2:#e63946;--glow:rgba(0,119,204,.4);--bg:#e8edf5;--bg2:#dce4ef;--card:#fff;--border:#c0cfe0;--dim:#7090b0;--text:#1a202c;}
 
-/* ─────────────────────────────────────────────────────── THEMES */
-:root, [data-theme="mars"] {
-  --bg: #080b14; --bg2: #0d1220; --card: #0f1627; --card-hover: #162035;
-  --accent: #e63946; --accent2: #00d4ff; --accent3: #ff6b35;
-  --text: #c8d6e5; --text-dim: #5a7a9a; --border: #1a2a40;
-  --glow: rgba(0,212,255,0.15); --glow-red: rgba(230,57,70,0.2);
-  --header-grad: rgba(0,212,255,0.03); --scan: rgba(0,0,0,0.03);
-}
-[data-theme="neon"] {
-  --bg: #050510; --bg2: #08081a; --card: #0a0a20; --card-hover: #10102a;
-  --accent: #ff00ff; --accent2: #00ffaa; --accent3: #ffff00;
-  --text: #e0e0ff; --text-dim: #5050aa; --border: #1a1a40;
-  --glow: rgba(0,255,170,0.15); --glow-red: rgba(255,0,255,0.2);
-  --header-grad: rgba(0,255,170,0.03); --scan: rgba(0,0,0,0.04);
-}
-[data-theme="hacker"] {
-  --bg: #000500; --bg2: #010801; --card: #020c02; --card-hover: #041204;
-  --accent: #00ff41; --accent2: #00cc33; --accent3: #39ff14;
-  --text: #00ff41; --text-dim: #006614; --border: #003300;
-  --glow: rgba(0,255,65,0.15); --glow-red: rgba(0,255,65,0.2);
-  --header-grad: rgba(0,255,65,0.03); --scan: rgba(0,0,0,0.06);
-}
-[data-theme="abyss"] {
-  --bg: #02020a; --bg2: #05050f; --card: #07071a; --card-hover: #0c0c22;
-  --accent: #7b2fff; --accent2: #ff2fff; --accent3: #2fffff;
-  --text: #c5b8ff; --text-dim: #4a3a80; --border: #1a1040;
-  --glow: rgba(123,47,255,0.15); --glow-red: rgba(255,47,255,0.2);
-  --header-grad: rgba(123,47,255,0.04); --scan: rgba(0,0,0,0.04);
-}
-[data-theme="ember"] {
-  --bg: #0f0600; --bg2: #160900; --card: #1a0c00; --card-hover: #241200;
-  --accent: #ff6a00; --accent2: #ffb347; --accent3: #ff3300;
-  --text: #ffe0b2; --text-dim: #7a4010; --border: #3a1800;
-  --glow: rgba(255,106,0,0.15); --glow-red: rgba(255,51,0,0.2);
-  --header-grad: rgba(255,179,71,0.04); --scan: rgba(0,0,0,0.04);
-}
-[data-theme="ice"] {
-  --bg: #00080f; --bg2: #000f1a; --card: #001525; --card-hover: #001e33;
-  --accent: #00cfff; --accent2: #80e8ff; --accent3: #ffffff;
-  --text: #cceeff; --text-dim: #336688; --border: #003355;
-  --glow: rgba(0,207,255,0.15); --glow-red: rgba(128,232,255,0.2);
-  --header-grad: rgba(0,207,255,0.04); --scan: rgba(0,0,0,0.03);
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'Rajdhani',sans-serif;
+  display:flex;flex-direction:column;
+  transition:background .3s,color .3s;
 }
 
-* { margin:0; padding:0; box-sizing:border-box; }
-body {
-  background: var(--bg); color: var(--text);
-  font-family: 'Rajdhani', sans-serif;
-  min-height: 100vh; overflow-x: hidden;
-}
-body::before {
-  content:''; position:fixed; inset:0;
-  background: radial-gradient(ellipse 80% 50% at 20% -10%, var(--glow) 0%, transparent 60%),
-              radial-gradient(ellipse 60% 40% at 80% 110%, var(--glow-red) 0%, transparent 60%);
-  pointer-events:none; z-index:0;
-}
-body::after {
-  content:''; position:fixed; inset:0;
-  background: repeating-linear-gradient(0deg,transparent,transparent 2px,var(--scan) 2px,var(--scan) 4px);
-  pointer-events:none; z-index:999;
-}
+/* ── SCANLINES ── */
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.022) 2px,rgba(0,0,0,.022) 4px);}
 
-/* ─────────────────────────────────────────────────────── LOADER */
-#loader-overlay {
-  position:fixed; inset:0; background:var(--bg); z-index:99999;
-  display:flex; align-items:center; justify-content:center;
-  flex-direction:column; gap:20px; transition:opacity 0.5s;
-}
-#loader-overlay.hidden { opacity:0; pointer-events:none; }
-.loader-title {
-  font-family:'Orbitron',sans-serif; font-size:28px; font-weight:900;
-  letter-spacing:6px; color:var(--accent2);
-  text-shadow:0 0 20px var(--glow); animation:pulse 1.5s ease-in-out infinite;
-}
-.loader-bar-wrap { width:280px; height:3px; background:var(--border); overflow:hidden; }
-.loader-bar { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); animation:loadbar 1.2s ease-in-out infinite; }
-.loader-text { font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:3px; color:var(--text-dim); text-transform:uppercase; }
-@keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.6} }
-@keyframes loadbar { 0%{width:0%;margin-left:0} 50%{width:60%;margin-left:20%} 100%{width:0%;margin-left:100%} }
-
-/* ─────────────────────────────────────────────────────── TOP TOOLBAR */
-#toolbar {
-  position:fixed; top:0; left:0; right:0; z-index:9990;
-  display:flex; gap:6px; padding:8px 12px; flex-wrap:wrap;
-  background:rgba(0,0,0,0.5); backdrop-filter:blur(10px);
+/* ── HEADER ── */
+#hdr{
+  flex-shrink:0;padding:14px 28px 10px;
   border-bottom:1px solid var(--border);
+  background:rgba(0,0,0,.3);backdrop-filter:blur(10px);
+  display:flex;align-items:center;gap:14px;
 }
-.tb-btn {
-  background:rgba(255,255,255,0.05); border:1px solid var(--border);
-  color:var(--text-dim); font-family:'Share Tech Mono',monospace; font-size:10px;
-  padding:5px 11px; cursor:pointer; letter-spacing:1.5px; text-transform:uppercase;
-  transition:all 0.18s;
-  clip-path:polygon(0 0,calc(100% - 5px) 0,100% 5px,100% 100%,5px 100%,0 calc(100% - 5px));
-}
-.tb-btn:hover, .tb-btn.active { border-color:var(--accent2); color:var(--accent2); background:rgba(0,212,255,0.08); }
-.tb-btn.danger { border-color:var(--accent); color:var(--accent); }
-.tb-btn.danger:hover { background:rgba(230,57,70,0.15); }
+.planet{width:30px;height:30px;border-radius:50%;flex-shrink:0;
+  background:radial-gradient(circle at 35% 35%,#ff6666,#cc0000 50%,#660000);
+  box-shadow:0 0 14px rgba(230,57,70,.6);}
+.logo{font-family:'Orbitron',sans-serif;font-size:clamp(16px,2.5vw,26px);
+  font-weight:900;letter-spacing:3px;}
+.logo-m{color:var(--a2);}.logo-g{color:var(--a);}
+#hdr-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+#user-pill{font-family:'Share Tech Mono',monospace;font-size:11px;
+  color:var(--a);background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);
+  padding:4px 10px;border-radius:20px;letter-spacing:1px;}
 
-/* ─────────────────────────────────────────────────────── THEME PANEL */
-#theme-panel {
-  position:fixed; top:46px; right:12px; z-index:9980;
-  background:var(--card); border:1px solid var(--border);
-  padding:14px; display:none; flex-direction:column; gap:8px; min-width:160px;
-  box-shadow:0 8px 32px rgba(0,0,0,0.6);
+/* ── GAME STAGE ── */
+#stage{
+  flex:1;position:relative;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;perspective:900px;
 }
-#theme-panel.open { display:flex; }
-#theme-panel h4 { font-family:'Orbitron',sans-serif; font-size:10px; letter-spacing:3px; color:var(--accent2); margin-bottom:4px; }
-.theme-option {
-  display:flex; align-items:center; gap:8px; cursor:pointer;
-  font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--text-dim);
-  padding:5px 8px; border:1px solid transparent; transition:all 0.15s;
-}
-.theme-option:hover { border-color:var(--border); color:var(--text); background:rgba(255,255,255,0.03); }
-.theme-option.active { border-color:var(--accent2); color:var(--accent2); }
-.theme-swatch { width:14px; height:14px; border-radius:50%; border:1px solid rgba(255,255,255,0.2); flex-shrink:0; }
 
-/* ─────────────────────────────────────────────────────── HEADER */
-header {
-  position:relative; z-index:10;
-  padding:72px 40px 20px;
-  border-bottom:1px solid var(--border);
-  background:linear-gradient(180deg,var(--header-grad) 0%,transparent 100%);
-}
-.header-inner { max-width:1500px; margin:0 auto; }
-.site-title {
-  font-family:'Orbitron',sans-serif; font-size:clamp(22px,4vw,42px); font-weight:900;
-  letter-spacing:4px; text-transform:uppercase; line-height:1;
-  display:flex; align-items:center; gap:16px;
-}
-.title-mars { color:var(--accent); text-shadow:0 0 20px var(--glow-red),0 0 40px var(--glow-red); }
-.title-rest { color:var(--accent2); text-shadow:0 0 20px var(--glow); }
-.title-icon {
-  width:36px; height:36px;
-  background:radial-gradient(circle,var(--accent) 30%,#4a0000 100%);
-  border-radius:50%; box-shadow:0 0 20px var(--glow-red),inset 0 -4px 8px rgba(0,0,0,0.4);
-  flex-shrink:0; position:relative; overflow:hidden;
-}
-.title-icon::after {
-  content:''; position:absolute; top:20%; left:15%; width:25%; height:15%;
-  background:rgba(255,255,255,0.3); border-radius:50%; transform:rotate(-30deg);
-}
-.header-sub { font-family:'Share Tech Mono',monospace; color:var(--text-dim); font-size:11px; letter-spacing:3px; margin-top:8px; text-transform:uppercase; }
+/* BG glow blob */
+#stage::before{content:'';position:absolute;
+  width:500px;height:200px;border-radius:50%;
+  background:radial-gradient(ellipse,var(--glow) 0%,transparent 70%);
+  opacity:.18;pointer-events:none;transition:background .4s;}
 
-/* ─────────────────────────────────────────────────────── CONTROLS */
-.controls {
-  position:sticky; top:44px; z-index:100;
-  background:rgba(8,11,20,0.93); backdrop-filter:blur(14px);
-  border-bottom:1px solid var(--border); padding:14px 40px;
+/* ── CARD TRACK ── */
+#track{
+  display:flex;align-items:center;gap:28px;
+  transition:transform .38s cubic-bezier(.22,1,.36,1);
+  position:relative;
 }
-.controls-inner { max-width:1500px; margin:0 auto; display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
-#search {
-  flex:1; min-width:180px;
-  background:var(--card); border:1px solid var(--border); color:var(--text);
-  font-family:'Share Tech Mono',monospace; font-size:13px; padding:9px 14px; outline:none;
-  transition:border-color 0.2s,box-shadow 0.2s;
-  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));
-}
-#search::placeholder { color:var(--text-dim); }
-#search:focus { border-color:var(--accent2); box-shadow:0 0 0 1px var(--accent2),0 0 12px var(--glow); }
-.filter-btns { display:flex; gap:6px; flex-wrap:wrap; }
-.filter-btn {
-  background:transparent; border:1px solid var(--border); color:var(--text-dim);
-  font-family:'Share Tech Mono',monospace; font-size:10px; padding:6px 12px;
-  cursor:pointer; letter-spacing:1px; text-transform:uppercase; transition:all 0.18s;
-}
-.filter-btn:hover,.filter-btn.active { border-color:var(--accent2); color:var(--accent2); background:rgba(0,212,255,0.07); }
-.game-count { font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--text-dim); margin-left:auto; white-space:nowrap; }
-.game-count span { color:var(--accent2); font-weight:bold; }
 
-/* ─────────────────────────────────────────────────────── MAIN */
-main { position:relative; z-index:1; max-width:1500px; margin:0 auto; padding:24px 40px 120px; }
-.section-label {
-  font-family:'Orbitron',sans-serif; font-size:10px; letter-spacing:4px; text-transform:uppercase;
-  color:var(--accent); margin:28px 0 14px; display:flex; align-items:center; gap:12px;
+/* ── SINGLE CARD ── */
+.gc{
+  flex-shrink:0;
+  width:220px;height:300px;
+  border-radius:18px;
+  background:var(--card);
+  border:2px solid var(--border);
+  cursor:pointer;
+  position:relative;
+  transition:
+    transform .38s cubic-bezier(.22,1,.36,1),
+    box-shadow .38s ease,
+    border-color .38s ease,
+    opacity .38s ease;
+  transform:scale(.78) rotateY(8deg);
+  opacity:.55;
+  display:flex;flex-direction:column;
+  overflow:hidden;
 }
-.section-label::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,var(--accent),transparent); opacity:0.3; }
+.gc.sel{
+  transform:scale(1) rotateY(0deg);
+  opacity:1;
+  border-color:var(--a);
+  box-shadow:
+    0 0 0 2px var(--a),
+    0 0 30px var(--glow),
+    0 0 60px rgba(0,0,0,.6);
+  animation:pulse-border 2s ease-in-out infinite;
+}
+.gc.left-adj{transform:scale(.82) rotateY(10deg);opacity:.6;}
+.gc.right-adj{transform:scale(.82) rotateY(-10deg);opacity:.6;}
+@keyframes pulse-border{
+  0%,100%{box-shadow:0 0 0 2px var(--a),0 0 22px var(--glow),0 0 50px rgba(0,0,0,.5);}
+  50%{box-shadow:0 0 0 2px var(--a),0 0 42px var(--glow),0 0 70px rgba(0,0,0,.5);}
+}
 
-/* ─────────────────────────────────────────────────────── GAME GRID */
-.game-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(185px,1fr)); gap:10px; }
-.game-card {
-  position:relative; background:var(--card); border:1px solid var(--border);
-  cursor:pointer; transition:all 0.2s ease;
-  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));
-  overflow:hidden; display:block; text-decoration:none; color:inherit;
-  animation:cardIn 0.3s ease both;
+/* card cover art area */
+.gc-art{
+  height:170px;background:var(--bg2);position:relative;
+  overflow:hidden;flex-shrink:0;
 }
-.game-card::before {
-  content:''; position:absolute; inset:0;
-  background:linear-gradient(135deg,rgba(0,212,255,0.04) 0%,transparent 60%);
-  opacity:0; transition:opacity 0.2s;
+.gc-art-inner{
+  width:100%;height:100%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:48px;letter-spacing:0;
+  background:linear-gradient(135deg,var(--bg2) 0%,rgba(0,0,0,.4) 100%);
+  position:relative;
 }
-.game-card:hover { border-color:var(--accent2); background:var(--card-hover); transform:translateY(-2px);
-  box-shadow:0 8px 24px rgba(0,0,0,0.4),0 0 0 1px rgba(0,212,255,0.2),0 0 16px var(--glow); }
-.game-card:hover::before { opacity:1; }
-.card-body { padding:12px 13px 10px; }
-.card-name { font-family:'Rajdhani',sans-serif; font-size:12px; font-weight:600; letter-spacing:0.5px; color:var(--text); line-height:1.3; transition:color 0.18s; word-break:break-word; }
-.game-card:hover .card-name { color:var(--accent2); }
-.card-tag { display:inline-block; margin-top:5px; font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:1px; text-transform:uppercase; color:var(--text-dim); background:rgba(255,255,255,0.03); padding:2px 5px; border:1px solid rgba(255,255,255,0.06); }
-.card-tooltip {
-  position:absolute; bottom:calc(100% + 6px); left:50%; transform:translateX(-50%);
-  background:#1a2535; border:1px solid var(--accent2); color:var(--text);
-  font-family:'Share Tech Mono',monospace; font-size:10px; padding:7px 11px; white-space:nowrap;
-  pointer-events:none; opacity:0; transition:opacity 0.12s; z-index:200;
-  box-shadow:0 4px 16px rgba(0,0,0,0.5),0 0 8px var(--glow);
+/* shimmer on selected */
+.gc.sel .gc-art-inner::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.06) 50%,transparent 70%);
+  animation:shimmer 2.5s ease-in-out infinite;
 }
-.card-tooltip::after { content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%); border:4px solid transparent; border-top-color:var(--accent2); }
-.game-card:hover .card-tooltip { opacity:1; }
-.tooltip-title { color:var(--accent2); font-weight:bold; display:block; margin-bottom:3px; }
-.tooltip-size { color:var(--text-dim); font-size:9px; }
-.no-results { display:none; text-align:center; padding:60px 20px; color:var(--text-dim); font-family:'Share Tech Mono',monospace; font-size:13px; letter-spacing:2px; }
-.no-results.show { display:block; }
-@keyframes cardIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+@keyframes shimmer{0%{transform:translateX(-100%);}100%{transform:translateX(100%);}}
 
-/* ─────────────────────────────────────────────────────── MUSIC PLAYER */
-#music-player {
-  position:fixed; bottom:0; left:0; right:0; z-index:9970;
-  background:rgba(8,11,20,0.97); backdrop-filter:blur(20px);
-  border-top:1px solid var(--border); padding:0;
-  transform:translateY(100%); transition:transform 0.35s cubic-bezier(.4,0,.2,1);
+.gc-tag{
+  position:absolute;top:10px;right:10px;
+  font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;
+  color:#fff;padding:3px 7px;border-radius:4px;text-transform:uppercase;
+  background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.15);
 }
-#music-player.open { transform:translateY(0); }
-#music-player.mini { transform:translateY(calc(100% - 50px)); }
-.player-bar {
-  display:flex; align-items:center; gap:12px; padding:8px 20px; cursor:pointer;
-  border-bottom:1px solid var(--border); min-height:50px;
-}
-.player-bar-info { flex:1; min-width:0; }
-.now-playing-label { font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:2px; color:var(--text-dim); text-transform:uppercase; }
-.now-playing-title { font-family:'Rajdhani',sans-serif; font-size:14px; font-weight:700; color:var(--accent2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.player-controls { display:flex; align-items:center; gap:10px; padding:12px 20px 14px; flex-wrap:wrap; }
-.p-btn {
-  background:transparent; border:1px solid var(--border); color:var(--text-dim);
-  font-size:14px; width:34px; height:34px; display:flex; align-items:center; justify-content:center;
-  cursor:pointer; transition:all 0.15s; font-family:monospace;
-}
-.p-btn:hover,.p-btn.active { border-color:var(--accent2); color:var(--accent2); }
-.p-btn.play-btn { border-color:var(--accent); color:var(--accent); width:40px; height:40px; font-size:16px; }
-.p-btn.play-btn:hover { background:rgba(230,57,70,0.15); }
-.player-progress { flex:1; display:flex; align-items:center; gap:8px; min-width:120px; }
-.progress-bar { flex:1; height:4px; background:var(--border); cursor:pointer; position:relative; }
-.progress-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); transition:width 0.5s; width:0%; }
-.time-display { font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--text-dim); white-space:nowrap; }
-.volume-wrap { display:flex; align-items:center; gap:6px; }
-#vol-slider { width:70px; accent-color:var(--accent2); cursor:pointer; }
-.track-list { max-height:160px; overflow-y:auto; border-top:1px solid var(--border); }
-.track-item {
-  display:flex; align-items:center; gap:10px; padding:8px 20px;
-  font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--text-dim);
-  cursor:pointer; transition:all 0.15s; border-bottom:1px solid rgba(255,255,255,0.03);
-}
-.track-item:hover { background:rgba(255,255,255,0.03); color:var(--text); }
-.track-item.playing { color:var(--accent2); background:rgba(0,212,255,0.05); }
-.track-num { color:var(--text-dim); width:20px; text-align:right; font-size:10px; }
-.track-name { flex:1; }
-.track-dur { color:var(--text-dim); font-size:10px; }
-/* vis bars */
-.vis-bars { display:flex; gap:2px; align-items:flex-end; height:20px; width:24px; }
-.vis-bar { width:3px; background:var(--accent2); border-radius:1px; animation:none; }
-.playing .vis-bar { animation:visBounce 0.6s ease-in-out infinite; }
-.vis-bar:nth-child(2) { animation-delay:0.1s; }
-.vis-bar:nth-child(3) { animation-delay:0.2s; }
-@keyframes visBounce { 0%,100%{height:4px}50%{height:18px} }
 
-/* ─────────────────────────────────────────────────────── GAME MODAL */
-#game-modal {
-  position:fixed; inset:0; z-index:99000; background:rgba(0,0,0,0.95);
-  display:none; flex-direction:column;
+/* card info */
+.gc-info{padding:14px 14px 10px;flex:1;display:flex;flex-direction:column;gap:5px;}
+.gc-name{font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;
+  letter-spacing:.5px;line-height:1.3;color:var(--text);}
+.gc.sel .gc-name{color:var(--a);}
+.gc-size{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--dim);}
+.gc-enter{
+  margin-top:auto;padding:7px 12px;border-radius:8px;
+  background:var(--a);color:#000;font-family:'Orbitron',monospace;
+  font-size:9px;letter-spacing:2px;font-weight:700;
+  text-align:center;opacity:0;transition:opacity .3s;
 }
-#game-modal.open { display:flex; }
-.modal-bar {
-  display:flex; align-items:center; gap:12px; padding:8px 16px;
-  background:var(--bg2); border-bottom:1px solid var(--border); flex-shrink:0;
-}
-.modal-title { font-family:'Orbitron',sans-serif; font-size:12px; letter-spacing:2px; color:var(--accent2); flex:1; }
-.modal-btn {
-  background:transparent; border:1px solid var(--border); color:var(--text-dim);
-  font-family:'Share Tech Mono',monospace; font-size:10px; padding:5px 10px;
-  cursor:pointer; letter-spacing:1px; transition:all 0.15s;
-}
-.modal-btn:hover { border-color:var(--accent2); color:var(--accent2); }
-.modal-btn.close-btn { border-color:var(--accent); color:var(--accent); }
-.modal-btn.close-btn:hover { background:rgba(230,57,70,0.15); }
-.modal-content { flex:1; position:relative; overflow:hidden; }
-#game-frame { width:100%; height:100%; border:none; background:#000; }
-#ruffle-container { width:100%; height:100%; }
-#ruffle-container ruffle-player { width:100%; height:100%; }
+.gc.sel .gc-enter{opacity:1;}
 
-/* HTML RUNNER */
-#html-runner {
-  position:fixed; inset:0; z-index:98000; background:var(--bg);
-  display:none; flex-direction:column;
+/* ── SEARCH ── */
+#search-wrap{
+  flex-shrink:0;padding:10px 28px 6px;
+  display:flex;align-items:center;gap:10px;
+  background:rgba(0,0,0,.25);
 }
-#html-runner.open { display:flex; }
-.runner-bar { display:flex; align-items:center; gap:10px; padding:8px 16px; background:var(--bg2); border-bottom:1px solid var(--border); flex-shrink:0; }
-.runner-bar h3 { font-family:'Orbitron',sans-serif; font-size:11px; letter-spacing:2px; color:var(--accent2); flex:1; }
-.runner-split { display:flex; flex:1; overflow:hidden; }
-#html-editor {
-  flex:1; resize:none; background:var(--card); color:var(--text);
-  font-family:'Share Tech Mono',monospace; font-size:12px; border:none;
-  border-right:1px solid var(--border); padding:14px; outline:none; tab-size:2;
+#search{
+  flex:1;max-width:420px;
+  background:var(--bg2);border:1px solid var(--border);
+  color:var(--text);font-family:'Share Tech Mono',monospace;
+  font-size:13px;padding:9px 14px;border-radius:10px;
+  outline:none;transition:border-color .2s,box-shadow .2s;
 }
-#html-preview { flex:1; border:none; background:#fff; }
+#search::placeholder{color:var(--dim);}
+#search:focus{border-color:var(--a);box-shadow:0 0 0 2px rgba(0,212,255,.15);}
+#search-count{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--dim);}
+#search-count span{color:var(--a);}
+.filter-wrap{display:flex;gap:6px;flex-wrap:wrap;}
+.fb{background:transparent;border:1px solid var(--border);color:var(--dim);
+  font-family:'Share Tech Mono',monospace;font-size:10px;
+  padding:5px 12px;border-radius:20px;cursor:pointer;letter-spacing:1px;
+  text-transform:uppercase;transition:all .18s;}
+.fb:hover,.fb.on{border-color:var(--a);color:var(--a);background:rgba(0,212,255,.07);}
 
-/* PROXY PANEL */
-#proxy-panel {
-  position:fixed; inset:0; z-index:97000; background:rgba(0,0,0,0.95);
-  display:none; flex-direction:column;
+/* ── BOTTOM BAR ── */
+#bot{
+  flex-shrink:0;padding:10px 20px;
+  background:rgba(0,0,0,.5);backdrop-filter:blur(12px);
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;
 }
-#proxy-panel.open { display:flex; }
-.proxy-bar { display:flex; align-items:center; gap:10px; padding:8px 16px; background:var(--bg2); border-bottom:1px solid var(--border); flex-shrink:0; }
-.proxy-bar h3 { font-family:'Orbitron',sans-serif; font-size:11px; letter-spacing:2px; color:var(--accent2); }
-.proxy-tabs { display:flex; gap:6px; margin-left:auto; }
-.proxy-tab { background:transparent; border:1px solid var(--border); color:var(--text-dim); font-family:'Share Tech Mono',monospace; font-size:10px; padding:5px 12px; cursor:pointer; letter-spacing:1px; transition:all 0.15s; }
-.proxy-tab.active { border-color:var(--accent2); color:var(--accent2); background:rgba(0,212,255,0.08); }
-.proxy-content { flex:1; display:none; flex-direction:column; padding:20px; gap:14px; overflow-y:auto; }
-.proxy-content.active { display:flex; }
-.proxy-url-bar { display:flex; gap:10px; }
-#proxy-url { flex:1; background:var(--card); border:1px solid var(--border); color:var(--text); font-family:'Share Tech Mono',monospace; font-size:13px; padding:10px 14px; outline:none; }
-#proxy-url:focus { border-color:var(--accent2); }
-.proxy-go { background:var(--accent2); border:none; color:#000; font-family:'Orbitron',monospace; font-size:11px; padding:10px 20px; cursor:pointer; font-weight:700; letter-spacing:2px; }
-#proxy-frame { flex:1; border:none; background:#fff; min-height:400px; border-radius:2px; }
-.proxy-info { font-family:'Share Tech Mono',monospace; font-size:12px; color:var(--text-dim); line-height:1.8; }
-.proxy-info a { color:var(--accent2); text-decoration:none; }
-.proxy-info a:hover { text-shadow:0 0 8px var(--glow); }
-
-/* FOOTER */
-footer { position:relative; z-index:1; border-top:1px solid var(--border); text-align:center; padding:22px 20px; font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:2px; color:var(--text-dim); }
-footer span { color:var(--accent); }
-footer a { color:var(--accent2); text-decoration:none; }
-
-/* RESPONSIVE */
-@media(max-width:600px) {
-  header,.controls { padding-left:14px; padding-right:14px; }
-  main { padding:18px 14px 120px; }
-  .game-grid { grid-template-columns:repeat(auto-fill,minmax(145px,1fr)); gap:8px; }
+.bb{
+  background:rgba(255,255,255,.06);border:1px solid var(--border);
+  color:var(--dim);font-family:'Share Tech Mono',monospace;
+  font-size:10px;padding:7px 16px;border-radius:30px;cursor:pointer;
+  letter-spacing:1px;text-transform:uppercase;transition:all .18s;
 }
-#toast.show { opacity:1 !important; }
-#settings-panel.open { display:flex !important; }
+.bb:hover{border-color:var(--a);color:var(--a);background:rgba(0,212,255,.08);}
+.bb.accent{border-color:var(--a2);color:var(--a2);}
+.bb.accent:hover{background:rgba(230,57,70,.12);}
+.bb.blob{border-color:#a855f7;color:#a855f7;}
+.bb.blob:hover{background:rgba(168,85,247,.12);}
+#nav-hint{font-family:'Share Tech Mono',monospace;font-size:10px;
+  color:var(--dim);letter-spacing:1px;margin-right:auto;}
+
+/* ── SETTINGS MODAL ── */
+#sov{position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,.75);
+  backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;}
+#sov.open{display:flex;}
+.sbox{background:var(--bg2);border:1px solid var(--border);
+  border-radius:16px;width:420px;max-width:95vw;max-height:85vh;overflow-y:auto;
+  box-shadow:0 0 40px rgba(0,0,0,.6);}
+.sh{padding:18px 22px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;}
+.st{font-family:'Orbitron',sans-serif;font-size:13px;letter-spacing:3px;color:var(--a);}
+.sc{background:none;border:none;color:var(--dim);cursor:pointer;font-size:18px;}
+.ss{padding:16px 22px;}
+.sl{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--a2);margin-bottom:12px;text-transform:uppercase;}
+.tg{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;}
+.tc{border:2px solid var(--border);border-radius:10px;padding:7px 5px;cursor:pointer;text-align:center;transition:all .18s;position:relative;}
+.tc:hover,.tc.on{border-color:var(--a);}
+.tc.on::after{content:'✓';position:absolute;top:3px;right:5px;font-size:10px;color:var(--a);}
+.tsw{width:100%;height:22px;border-radius:5px;margin-bottom:5px;}
+.tnm{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--dim);}
+
+/* ── LOGIN SCREEN ── */
+#ls{position:fixed;inset:0;z-index:9000;background:#050810;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;}
+#ls.gone{display:none;}
+.lb{background:rgba(15,22,39,.98);border:1px solid #1a2a40;
+  border-radius:16px;padding:44px 36px 36px;width:340px;position:relative;}
+.lpl{width:52px;height:52px;border-radius:50%;margin:0 auto 12px;
+  background:radial-gradient(circle at 35% 35%,#ff6666,#cc0000 50%,#660000);
+  box-shadow:0 0 24px rgba(230,57,70,.5);}
+.lh{font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;
+  letter-spacing:4px;color:#00d4ff;text-align:center;text-shadow:0 0 16px rgba(0,212,255,.5);}
+.lsub{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;
+  color:#3a5a7a;text-align:center;margin:4px 0 26px;}
+.lf label{display:block;font-family:'Share Tech Mono',monospace;font-size:10px;
+  letter-spacing:2px;color:#3a5a7a;text-transform:uppercase;margin-bottom:5px;}
+.lf{margin-bottom:13px;}
+.lf input{width:100%;background:#080b14;border:1px solid #1a2a40;color:#c8d6e5;
+  font-family:'Share Tech Mono',monospace;font-size:13px;padding:9px 12px;
+  border-radius:8px;outline:none;transition:border-color .2s;}
+.lf input:focus{border-color:#00d4ff;}
+.lbtn{width:100%;background:linear-gradient(135deg,#e63946,#c41230);border:none;
+  color:#fff;font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;
+  letter-spacing:3px;padding:12px;border-radius:10px;cursor:pointer;margin-top:6px;
+  transition:all .2s;}
+.lbtn:hover{box-shadow:0 0 18px rgba(230,57,70,.4);}
+.lerr{color:#e63946;font-family:'Share Tech Mono',monospace;font-size:11px;
+  text-align:center;margin-top:10px;min-height:16px;}
+
+/* ── GAME LAUNCH ── */
+#launch{position:fixed;inset:0;z-index:7000;background:var(--bg);display:none;
+  flex-direction:column;}
+#launch.open{display:flex;}
+#launch-bar{
+  background:rgba(0,0,0,.8);border-bottom:1px solid var(--border);
+  padding:8px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;
+}
+#launch-title{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--a);flex:1;}
+.lc-btn{background:none;border:1px solid var(--border);color:var(--dim);
+  font-family:'Share Tech Mono',monospace;font-size:10px;
+  padding:4px 12px;border-radius:20px;cursor:pointer;transition:all .18s;}
+.lc-btn:hover{border-color:var(--a2);color:var(--a2);}
+#launch-frame{flex:1;width:100%;border:none;}
 </style>
 </head>
-<body data-theme="mars">
+<body>
 
-<!-- LOADER -->
-<div id="loader-overlay">
-  <div class="loader-title">MARS GAME STASH</div>
-  <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
-  <div class="loader-text">Loading game library...</div>
-</div>
-
-<!-- TOP TOOLBAR -->
-<div id="toolbar">
-  <button class="tb-btn danger" onclick="cloakBlank()">⬛ Blank Cloak</button>
-  <button class="tb-btn danger" onclick="cloakBlob()">🔵 Blob Cloak</button>
-  <button class="tb-btn" onclick="toggleThemePanel()">🎨 Theme</button>
-  <button class="tb-btn" onclick="openHTMLRunner()">💻 HTML Runner</button>
-  <button class="tb-btn" onclick="openProxy()">🌐 Proxy</button>
-  <button class="tb-btn" onclick="toggleMusic()">🎵 Music</button>
-  <button class="tb-btn" onclick="openSettings()">⚙️ Settings</button>
-</div>
-
-<!-- THEME PANEL -->
-<div id="theme-panel">
-  <h4>// SELECT THEME</h4>
-  <div class="theme-option active" data-theme="mars" onclick="setTheme('mars',this)">
-    <div class="theme-swatch" style="background:radial-gradient(circle,#e63946,#00d4ff)"></div> Mars (Default)
-  </div>
-  <div class="theme-option" data-theme="neon" onclick="setTheme('neon',this)">
-    <div class="theme-swatch" style="background:radial-gradient(circle,#ff00ff,#00ffaa)"></div> Neon Grid
-  </div>
-  <div class="theme-option" data-theme="hacker" onclick="setTheme('hacker',this)">
-    <div class="theme-swatch" style="background:radial-gradient(circle,#00ff41,#003300)"></div> Hacker
-  </div>
-  <div class="theme-option" data-theme="abyss" onclick="setTheme('abyss',this)">
-    <div class="theme-swatch" style="background:radial-gradient(circle,#7b2fff,#ff2fff)"></div> Abyss
-  </div>
-  <div class="theme-option" data-theme="ember" onclick="setTheme('ember',this)">
-    <div class="theme-swatch" style="background:radial-gradient(circle,#ff6a00,#ffb347)"></div> Ember
-  </div>
-  <div class="theme-option" data-theme="ice" onclick="setTheme('ice',this)">
-    <div class="theme-swatch" style="background:radial-gradient(circle,#00cfff,#cceeff)"></div> Ice
+<!-- LOGIN -->
+<div id="ls">
+  <div class="lb">
+    <div class="lpl"></div>
+    <div class="lh">MARS GAME STASH</div>
+    <div class="lsub">// private access only</div>
+    <div class="lf"><label>Username</label><input id="lu" type="text" placeholder="username" autocomplete="off"></div>
+    <div class="lf"><label>Password</label><input id="lp" type="password" placeholder="password" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="lbtn" onclick="doLogin()">ACCESS STASH</button>
+    <div class="lerr" id="lerr"></div>
   </div>
 </div>
 
-<header>
-  <div class="header-inner">
-    <div class="site-title">
-      <div class="title-icon"></div>
-      <span class="title-mars">Mars</span>
-      <span class="title-rest">Game Stash</span>
-    </div>
-    <div class="header-sub">// private unblocked library — play anything, anywhere</div>
+<!-- GAME LAUNCH OVERLAY -->
+<div id="launch">
+  <div id="launch-bar">
+    <span id="launch-title">▶ Loading...</span>
+    <button class="lc-btn" onclick="closeLaunch()">✕ CLOSE</button>
   </div>
-</header>
+  <iframe id="launch-frame" src="about:blank" allowfullscreen allow="fullscreen"></iframe>
+</div>
 
-<div class="controls">
-  <div class="controls-inner">
-    <input type="text" id="search" placeholder="Search games..." oninput="filterGames()" autocomplete="off">
-    <div class="filter-btns">
-      <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
-      <button class="filter-btn" onclick="setFilter('html5',this)">HTML5</button>
-      <button class="filter-btn" onclick="setFilter('flash',this)">Flash</button>
-      <button class="filter-btn" onclick="setFilter('emulated',this)">Emulated</button>
-      <button class="filter-btn" onclick="setFilter('fnf',this)">FNF</button>
-    </div>
-    <div class="game-count">GAMES: <span id="count">0</span></div>
+<!-- HEADER -->
+<div id="hdr">
+  <div class="planet"></div>
+  <div class="logo"><span class="logo-m">Mars</span> <span class="logo-g">Game Stash</span></div>
+  <div id="hdr-right">
+    <div id="user-pill">---</div>
   </div>
 </div>
 
-<main>
-  <div id="no-results" class="no-results">NO GAMES FOUND — TRY A DIFFERENT SEARCH</div>
-  <div id="game-grid" class="game-grid"></div>
-</main>
-
-<footer>
-  Private unblocked game stash by <span>Mars</span> &nbsp;|&nbsp;
-  Discord: <a href="#">marmaryt2590butnew</a>
-</footer>
-
-<!-- ═══════════════════ GAME MODAL (iframe + ruffle) ═══════════════════ -->
-<div id="game-modal">
-  <div class="modal-bar">
-    <span class="modal-title" id="modal-title">LOADING...</span>
-    <button class="modal-btn" onclick="modalFullscreen()">⛶ Fullscreen</button>
-    <button class="modal-btn" onclick="reloadGame()">↺ Reload</button>
-    <button class="modal-btn close-btn" onclick="closeModal()">✕ Close</button>
-  </div>
-  <div class="modal-content">
-    <iframe id="game-frame" allowfullscreen allow="fullscreen"></iframe>
-    <div id="ruffle-container" style="display:none;"></div>
-  </div>
+<!-- GAME STAGE -->
+<div id="stage">
+  <div id="track"></div>
 </div>
 
-<!-- ═══════════════════ HTML RUNNER ═══════════════════ -->
-<div id="html-runner">
-  <div class="runner-bar">
-    <h3>// HTML RUNNER / COMPILER</h3>
-    <button class="modal-btn" onclick="runHTML()">▶ Run</button>
-    <button class="modal-btn" onclick="clearEditor()">✕ Clear</button>
-    <button class="modal-btn" onclick="fullscreenPreview()">⛶ Fullscreen Preview</button>
-    <button class="modal-btn close-btn" onclick="closeHTMLRunner()">✕ Close</button>
+<!-- SEARCH -->
+<div id="search-wrap">
+  <input id="search" type="text" placeholder="🔍 Search games..." oninput="onSearch()" autocomplete="off">
+  <div class="filter-wrap" id="filters">
+    <button class="fb on" onclick="setF('all',this)">All</button>
+    <button class="fb" onclick="setF('html5',this)">HTML5</button>
+    <button class="fb" onclick="setF('flash',this)">Flash</button>
+    <button class="fb" onclick="setF('emulated',this)">Emulated</button>
+    <button class="fb" onclick="setF('fnf',this)">FNF</button>
+    <button class="fb" onclick="setF('pokemon',this)">Pokémon</button>
   </div>
-  <div class="runner-split">
-    <textarea id="html-editor" placeholder="<!-- Paste or write HTML here, then click Run -->" spellcheck="false"></textarea>
-    <iframe id="html-preview"></iframe>
-  </div>
+  <div id="search-count"><span id="cnt">0</span> games</div>
 </div>
 
-<!-- ═══════════════════ PROXY PANEL ═══════════════════ -->
-<div id="proxy-panel">
-  <div class="proxy-bar">
-    <h3>// WEB PROXY</h3>
-    <div class="proxy-tabs">
-      <button class="proxy-tab active" onclick="showProxyTab('helios',this)">Helios</button>
-      <button class="proxy-tab" onclick="showProxyTab('sandstone',this)">Sandstone</button>
-      <button class="proxy-tab" onclick="showProxyTab('ultraviolet',this)">Ultraviolet</button>
-      <button class="proxy-tab" onclick="showProxyTab('rammerhead',this)">Rammerhead</button>
-    </div>
-    <button class="modal-btn close-btn" style="margin-left:10px;" onclick="closeProxy()">✕ Close</button>
-  </div>
-  <!-- Helios -->
-  <div class="proxy-content active" id="proxy-helios">
-    <div class="proxy-info">
-      <b style="color:var(--accent2)">Helios Proxy</b> — Fast UV-based web proxy<br>
-      Click the link below to open Helios in this frame, or visit directly:
-      <a href="https://heliosgg.netlify.app" target="_blank">heliosgg.netlify.app</a>
-    </div>
-    <div class="proxy-url-bar">
-      <input type="text" id="proxy-url" placeholder="Enter URL (e.g. https://google.com)" value="https://heliosgg.netlify.app">
-      <button class="proxy-go" onclick="loadProxy('helios')">GO</button>
-    </div>
-    <iframe id="proxy-frame-helios" class="proxy-frame-el" src="https://heliosgg.netlify.app" style="flex:1;border:none;min-height:400px;background:#fff;"></iframe>
-  </div>
-  <!-- Sandstone -->
-  <div class="proxy-content" id="proxy-sandstone">
-    <div class="proxy-info">
-      <b style="color:var(--accent2)">Sandstone Proxy</b> — Lightweight bare-metal proxy<br>
-      Visit: <a href="https://sandstone.pages.dev" target="_blank">sandstone.pages.dev</a>
-    </div>
-    <div class="proxy-url-bar">
-      <input type="text" id="proxy-url-2" placeholder="Enter URL" value="https://sandstone.pages.dev">
-      <button class="proxy-go" onclick="loadProxy('sandstone')">GO</button>
-    </div>
-    <iframe id="proxy-frame-sandstone" class="proxy-frame-el" src="https://sandstone.pages.dev" style="flex:1;border:none;min-height:400px;background:#fff;"></iframe>
-  </div>
-  <!-- Ultraviolet -->
-  <div class="proxy-content" id="proxy-ultraviolet">
-    <div class="proxy-info">
-      <b style="color:var(--accent2)">Ultraviolet Proxy</b> — The gold standard of web proxies<br>
-      Visit: <a href="https://uv.wtf" target="_blank">uv.wtf</a>
-    </div>
-    <div class="proxy-url-bar">
-      <input type="text" id="proxy-url-3" placeholder="Enter URL" value="https://uv.wtf">
-      <button class="proxy-go" onclick="loadProxy('ultraviolet')">GO</button>
-    </div>
-    <iframe id="proxy-frame-ultraviolet" class="proxy-frame-el" src="https://uv.wtf" style="flex:1;border:none;min-height:400px;background:#fff;"></iframe>
-  </div>
-  <!-- Rammerhead -->
-  <div class="proxy-content" id="proxy-rammerhead">
-    <div class="proxy-info">
-      <b style="color:var(--accent2)">Rammerhead Proxy</b> — Powerful JS-rewriting proxy<br>
-      Visit: <a href="https://rammerhead.org" target="_blank">rammerhead.org</a>
-    </div>
-    <div class="proxy-url-bar">
-      <input type="text" id="proxy-url-4" placeholder="Enter URL" value="https://rammerhead.org">
-      <button class="proxy-go" onclick="loadProxy('rammerhead')">GO</button>
-    </div>
-    <iframe id="proxy-frame-rammerhead" class="proxy-frame-el" src="https://rammerhead.org" style="flex:1;border:none;min-height:400px;background:#fff;"></iframe>
-  </div>
+<!-- BOTTOM BAR -->
+<div id="bot">
+  <span id="nav-hint">◀ ▶ Navigate &nbsp;|&nbsp; ENTER to play &nbsp;|&nbsp; ESC close</span>
+  <button class="bb" onclick="openSettings()">⚙ Settings</button>
+  <button class="bb blob" onclick="blobCloak()">🫧 Blob Cloak</button>
+  <button class="bb accent" onclick="abCloak()">⬛ AB Cloak</button>
+  <button class="bb" onclick="doLogout()">⏻ Logout</button>
 </div>
 
-<!-- ═══════════════════ SETTINGS PANEL ═══════════════════ -->
-<div id="settings-panel" style="position:fixed;inset:0;z-index:98500;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;">
-  <div style="background:var(--card);border:1px solid var(--border);min-width:340px;max-width:480px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.8);">
-    <div style="display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--border);background:var(--bg2);">
-      <span style="font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:3px;color:var(--accent2);flex:1;">⚙️ SETTINGS</span>
-      <button class="modal-btn close-btn" onclick="closeSettings()">✕ Close</button>
-    </div>
-    <div style="padding:20px;display:flex;flex-direction:column;gap:18px;">
-      <div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--accent);margin-bottom:6px;text-transform:uppercase;">// Tab Disguise</div>
-        <label style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);display:block;margin-bottom:5px;">Tab Title</label>
-        <input id="s-tab-title" type="text" placeholder="Google Classroom" value="Mars Game Stash"
-          style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:12px;padding:8px 12px;outline:none;">
-        <label style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);display:block;margin-top:10px;margin-bottom:5px;">Favicon URL (leave blank for default)</label>
-        <input id="s-favicon" type="text" placeholder="https://example.com/favicon.ico"
-          style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:12px;padding:8px 12px;outline:none;">
-      </div>
-      <div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--accent);margin-bottom:6px;text-transform:uppercase;">// Quick Tab Presets</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <button class="filter-btn" onclick="document.getElementById('s-tab-title').value='Google Classroom'">Classroom</button>
-          <button class="filter-btn" onclick="document.getElementById('s-tab-title').value='Khan Academy'">Khan Academy</button>
-          <button class="filter-btn" onclick="document.getElementById('s-tab-title').value='Google Docs'">Google Docs</button>
-          <button class="filter-btn" onclick="document.getElementById('s-tab-title').value='Quizlet'">Quizlet</button>
-          <button class="filter-btn" onclick="document.getElementById('s-tab-title').value='Google Slides'">Slides</button>
-        </div>
-      </div>
-      <div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--accent);margin-bottom:8px;text-transform:uppercase;">// Cloak</div>
-        <div style="display:flex;gap:8px;">
-          <button class="tb-btn danger" onclick="cloakBlank()" style="flex:1;">⬛ Blank Cloak</button>
-          <button class="tb-btn danger" onclick="cloakBlob()" style="flex:1;">🔵 Blob Cloak</button>
-        </div>
-      </div>
-      <div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--accent);margin-bottom:8px;text-transform:uppercase;">// Panic Key</div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <label style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);">Key combo:</label>
-          <select id="s-panic-key" style="background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:11px;padding:5px 8px;outline:none;">
-            <option value="Escape">Escape</option>
-            <option value="F1">F1</option>
-            <option value="F2">F2</option>
-            <option value="F5">F5</option>
-          </select>
-          <label style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);">→</label>
-          <select id="s-panic-dest" style="background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:11px;padding:5px 8px;outline:none;flex:1;">
-            <option value="https://classroom.google.com">Google Classroom</option>
-            <option value="https://docs.google.com">Google Docs</option>
-            <option value="https://kahoot.it">Kahoot</option>
-            <option value="https://quizlet.com">Quizlet</option>
-          </select>
-        </div>
-      </div>
-      <button class="proxy-go" onclick="applySettings()" style="align-self:flex-start;padding:10px 28px;letter-spacing:2px;">✓ SAVE SETTINGS</button>
+<!-- SETTINGS -->
+<div id="sov"><div class="sbox">
+  <div class="sh"><span class="st">⚙ SETTINGS</span><button class="sc" onclick="closeSett()">✕</button></div>
+  <div class="ss">
+    <div class="sl">Theme</div>
+    <div class="tg">
+      <div class="tc on" id="t-dark" onclick="setTheme('',this)"><div class="tsw" style="background:linear-gradient(135deg,#07090f,#1a2a40)"></div><div class="tnm">DARK</div></div>
+      <div class="tc" id="t-light" onclick="setTheme('light',this)"><div class="tsw" style="background:linear-gradient(135deg,#e8edf5,#c0cfe0)"></div><div class="tnm">LIGHT</div></div>
+      <div class="tc" id="t-pink" onclick="setTheme('pink',this)"><div class="tsw" style="background:linear-gradient(135deg,#100010,#ff69b4)"></div><div class="tnm">PINK</div></div>
+      <div class="tc" id="t-rainbow" onclick="setTheme('rainbow',this)"><div class="tsw" style="background:linear-gradient(135deg,#ff0080,#ffcc00,#00ffcc)"></div><div class="tnm">RAINBOW</div></div>
+      <div class="tc" id="t-maroon" onclick="setTheme('maroon',this)"><div class="tsw" style="background:linear-gradient(135deg,#0f0000,#cc2222)"></div><div class="tnm">MAROON</div></div>
+      <div class="tc" id="t-choco" onclick="setTheme('choco',this)"><div class="tsw" style="background:linear-gradient(135deg,#1a0f05,#c8853a)"></div><div class="tnm">CHOCO</div></div>
+      <div class="tc" id="t-hacker" onclick="setTheme('hacker',this)"><div class="tsw" style="background:linear-gradient(135deg,#000,#00ff00)"></div><div class="tnm">HACKER</div></div>
     </div>
   </div>
-</div>
-
-<!-- TOAST -->
-<div id="toast" style="position:fixed;bottom:120px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--accent2);color:var(--accent2);font-family:'Share Tech Mono',monospace;font-size:12px;padding:8px 20px;letter-spacing:2px;z-index:99999;opacity:0;transition:opacity 0.3s;pointer-events:none;"></div>
-
-<!-- ═══════════════════ MUSIC PLAYER ═══════════════════ -->
-<div id="music-player" class="mini">
-  <div class="player-bar" onclick="toggleMusicExpand()">
-    <div class="vis-bars" id="vis-bars">
-      <div class="vis-bar"></div><div class="vis-bar"></div><div class="vis-bar"></div>
-    </div>
-    <div class="player-bar-info">
-      <div class="now-playing-label">Now Playing</div>
-      <div class="now-playing-title" id="np-title">Select a track...</div>
-    </div>
-    <span style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim)">▾ EXPAND</span>
-  </div>
-  <div class="player-controls">
-    <button class="p-btn" onclick="prevTrack()" title="Previous">⏮</button>
-    <button class="p-btn play-btn" id="play-btn" onclick="togglePlay()">▶</button>
-    <button class="p-btn" onclick="nextTrack()" title="Next">⏭</button>
-    <button class="p-btn" id="shuffle-btn" onclick="toggleShuffle()" title="Shuffle">⇌</button>
-    <button class="p-btn" id="loop-btn" onclick="toggleLoop()" title="Loop">↻</button>
-    <div class="player-progress">
-      <span class="time-display" id="time-cur">0:00</span>
-      <div class="progress-bar" onclick="seekTo(event)" id="prog-bar">
-        <div class="progress-fill" id="prog-fill"></div>
-      </div>
-      <span class="time-display" id="time-dur">0:00</span>
-    </div>
-    <div class="volume-wrap">
-      🔊 <input type="range" id="vol-slider" min="0" max="1" step="0.01" value="0.7" oninput="setVol(this.value)">
-    </div>
-  </div>
-  <div class="track-list" id="track-list"></div>
-</div>
-
-<!-- hidden audio -->
-<audio id="audio-player" preload="metadata"></audio>
+</div></div>
 
 <script>
-// ═══════════════════════════════════════════════════════
-//  CLOAK FUNCTIONS
-// ═══════════════════════════════════════════════════════
-function cloakBlank() {
-  const win = window.open('about:blank','_blank');
-  if (!win) { alert('Allow popups!'); return; }
-  const html = document.documentElement.outerHTML;
-  win.document.open(); win.document.write(html); win.document.close();
-  win.document.title = 'Google Classroom';
-  window.location.href = 'https://classroom.google.com';
-}
+// ── ACCOUNTS (no passwords stored — just username check) ──
+const USERS={mars:'owner',Elijah:'admin',Eli:'admin',Albert:'admin'};
+let CU=null, CT='Google Classroom';
 
-function cloakBlob() {
-  const html = document.documentElement.outerHTML;
-  const blob = new Blob([html], {type:'text/html'});
-  const url = URL.createObjectURL(blob);
-  const win = window.open(url,'_blank');
-  if (!win) { alert('Allow popups!'); return; }
-  setTimeout(() => { URL.revokeObjectURL(url); }, 10000);
-  window.location.href = 'https://classroom.google.com';
+function doLogin(){
+  const u=document.getElementById('lu').value.trim();
+  const p=document.getElementById('lp').value;
+  const e=document.getElementById('lerr');
+  // Simple: accept any password, just check username exists
+  if(!u){e.textContent='// enter a username';return;}
+  const role=USERS[u]||USERS[Object.keys(USERS).find(k=>k.toLowerCase()===u.toLowerCase())];
+  if(!role){e.textContent='// username not recognised';return;}
+  CU={u,role};
+  document.getElementById('ls').classList.add('gone');
+  document.getElementById('user-pill').textContent=u.toUpperCase()+' ['+role+']';
+  document.title=CT;
+  render();
 }
+function doLogout(){CU=null;document.getElementById('ls').classList.remove('gone');document.getElementById('lu').value='';document.getElementById('lp').value='';document.getElementById('lerr').textContent='';}
 
-// ═══════════════════════════════════════════════════════
-//  THEME
-// ═══════════════════════════════════════════════════════
-function setTheme(t, el) {
-  document.body.setAttribute('data-theme', t);
-  document.querySelectorAll('.theme-option').forEach(o => o.classList.remove('active'));
-  if(el) el.classList.add('active');
-  localStorage.setItem('mgs-theme', t);
-}
-function toggleThemePanel() {
-  document.getElementById('theme-panel').classList.toggle('open');
-}
-document.addEventListener('click', e => {
-  const p = document.getElementById('theme-panel');
-  if(p.classList.contains('open') && !p.contains(e.target) && !e.target.closest('#toolbar')) p.classList.remove('open');
-});
+// ── CLOAK ──
+function abCloak(){const w=window.open('about:blank','_blank');if(!w)return;w.document.open();w.document.write(document.documentElement.outerHTML);w.document.close();w.document.title=CT;window.location.href='https://classroom.google.com';}
+function blobCloak(){const b=new Blob([document.documentElement.outerHTML],{type:'text/html'});const u=URL.createObjectURL(b);const w=window.open(u,'_blank');if(w)setTimeout(()=>{try{w.document.title=CT;}catch(e){}},300);}
 
-// ═══════════════════════════════════════════════════════
-//  GAME DATA
-// ═══════════════════════════════════════════════════════
-const games = [
-  // ── HTML5 ──
-  {n:"Baldi's Basics",u:"https://drive.google.com/file/d/1UeCBcErh14gonxfw0y2amxbrqZfrttKj/view",t:"html5",mb:"~15MB"},
-  {n:"Baseball Bros",u:"https://drive.google.com/file/d/1C4G1M6f2VNuS61lYqrv9MGEtnFMtP-TP/view",t:"html5",mb:"~8MB"},
-  {n:"Basket Bros",u:"https://drive.google.com/file/d/1R6OCaS56zMHchP9zsHbxeFXx-3SsPuAU/view",t:"html5",mb:"~20MB"},
-  {n:"Basket Random",u:"https://drive.google.com/file/d/1mq1psi8_H4jyQslycPGSR-dbkWJ1QAW9/view",t:"html5",mb:"~12MB"},
-  {n:"Tomb of the Mask",u:"https://drive.google.com/file/d/1uCr1KuIfZ46DJeOX92ZYY2nlyQ6ulPcs/view",t:"html5",mb:"~18MB"},
-  {n:"BitLife",u:"https://drive.google.com/file/d/1qdHWXaWjyk4wvpxf9q6S-lQP9X0DhsTA/view",t:"html5",mb:"~40MB"},
-  {n:"Escape Road",u:"https://drive.google.com/file/d/14vjJbM91SrRGqic6DG9CqQ5r5NPKEzMo/view",t:"html5",mb:"~22MB"},
-  {n:"Drive Mad",u:"https://drive.google.com/file/d/1_U2IKm5-MY5hUROiO46BaOWy81ym_yhr/view",t:"html5",mb:"~18MB"},
-  {n:"Crazy Cattle 3D",u:"https://drive.google.com/file/d/1l9yA5vMAqkcrH8Jua2LEnD-s-wTIFZ0R/view",t:"html5",mb:"~55MB"},
-  {n:"Cookie Clicker",u:"https://drive.google.com/file/d/1kDlM4BCzn7TMezp94VWPL5RhbFXZIwf-/view",t:"html5",mb:"~8MB"},
-  {n:"Burrito Bison Launcha Libre",u:"https://drive.google.com/file/d/1Mvs0de1vB6AtPBHYUpYVaXzUmt2D9QtY/view",t:"html5",mb:"~30MB"},
-  {n:"Rooftop Snipers",u:"https://drive.google.com/file/d/1RSrgfX1zyTi5GsOCkBWDqyG7q3FMzPBW/view",t:"html5",mb:"~10MB"},
-  {n:"Retro Bowl",u:"https://drive.google.com/file/d/1U0oR-obhfztS7tMeA1wTirCYeKD_f7_a/view",t:"html5",mb:"~14MB"},
-  {n:"Snow Rider 3D",u:"https://drive.google.com/file/d/1LEYD8dy6nt7zpBHsO0OPN56efXn7L419/view",t:"html5",mb:"~35MB"},
-  {n:"Run 3",u:"https://drive.google.com/file/d/18vF8LB5DpPYIaZ_UarNOcxyx044gu19o/view",t:"html5",mb:"~28MB"},
-  {n:"Slope",u:"https://drive.google.com/file/d/1csdFwFf5p_De_IadUUVXVGl0h3ivFD63/view",t:"html5",mb:"~12MB"},
-  {n:"Doki Doki Literature Club",u:"https://drive.google.com/file/d/1uj9FGWBCSbYlE687dedSZEO1pF4e6iRC/view",t:"html5",mb:"~200MB"},
-  {n:"Deltarune",u:"https://drive.google.com/file/d/1Z8whTWE02uB9hEga3jaW6AkQhzEaFGKh/view",t:"html5",mb:"~180MB"},
-  {n:"Dreadhead Parkour",u:"https://drive.google.com/file/d/1g_1WN6LNM1q5drv-cUTiUk09Y3ZwnM6p/view",t:"html5",mb:"~22MB"},
-  {n:"1v1.lol",u:"https://drive.google.com/file/d/16SVHF4XRFjv5WCqlLHJZhF6nkBM7q4ex/view",t:"html5",mb:"~45MB"},
-  {n:"2048",u:"https://drive.google.com/file/d/13xSrRMeCad0nyxRTPaaTQIMzVHk5Cd_s/view",t:"html5",mb:"~1MB"},
-  {n:"10 Minutes Till Dawn",u:"https://drive.google.com/file/d/1b2druj6_Zlrdq1h9gS4oaqQwJvND4z08/view",t:"html5",mb:"~18MB"},
-  {n:"Smash Karts",u:"https://drive.google.com/file/d/1Xz6hyYp4-ckBrkDa8mdVqPeC1nwMljyg/view",t:"html5",mb:"~65MB"},
-  {n:"Getaway Shootout",u:"https://drive.google.com/file/d/14B32tBAhluuDTRg0oYHuQykADNN0LUTD/view",t:"html5",mb:"~14MB"},
-  {n:"OVO",u:"https://drive.google.com/file/d/1Uqan3Lv0gldfyBGp6QY6_q0HZmLuU30d/view",t:"html5",mb:"~6MB"},
-  {n:"Slope 3",u:"https://drive.google.com/file/d/18IWxc8OY4eBwMGlJ0a5A2uK_-l8KI6au/view",t:"html5",mb:"~16MB"},
-  {n:"Moto X3M",u:"https://drive.google.com/file/d/1R-J62MHWd7po7gRHGOitewZ3qPs1vGEj/view",t:"html5",mb:"~22MB"},
-  {n:"Tunnel Rush",u:"https://drive.google.com/file/d/1oOts85wAfZNzl0rLOl1azcMB9cWfd6ws/view",t:"html5",mb:"~8MB"},
-  {n:"Vex 5",u:"https://drive.google.com/file/d/1D-705UyHXz6UWCnpgNL123tMIDoy0Q7C/view",t:"html5",mb:"~18MB"},
-  {n:"Vex 6",u:"https://drive.google.com/file/d/1vOmwZHRpz_4nUGf_VKW01mjt6nOiOWf5/view",t:"html5",mb:"~20MB"},
-  {n:"Vex 7",u:"https://drive.google.com/file/d/1r5FMGSERumWQags8qggpWq1pmgl9DKPW/view",t:"html5",mb:"~22MB"},
-  {n:"Vex 8",u:"https://drive.google.com/file/d/1OhGOhkjdmBpe3XYTO7h1zF6gAw5j4KU2/view",t:"html5",mb:"~24MB"},
-  {n:"House of Hazards",u:"https://drive.google.com/file/d/1pwmfcL73hVdjuqO8sFOKCRsuLzT6YPjL/view",t:"html5",mb:"~30MB"},
-  {n:"Drift Boss",u:"https://drive.google.com/file/d/1UNbv-2GnAKy5AHvuRUCRy9E6mBuDmywM/view",t:"html5",mb:"~15MB"},
-  {n:"Dinosaur Game",u:"https://drive.google.com/file/d/17eDFviFV8EVCT5g0eTuYlaD607LXY6iD/view",t:"html5",mb:"~1MB"},
-  {n:"Subway Surfers: Berlin",u:"https://drive.google.com/file/d/13PrK1H6bbhDtG1YeOutOV2OGXTfTVpym/view",t:"html5",mb:"~120MB"},
-  {n:"Subway Surfers: London",u:"https://drive.google.com/file/d/17ys8g9hw7rrVAebugJdPUDnvczx-gHxc/view",t:"html5",mb:"~120MB"},
-  {n:"Subway Surfers: Beijing",u:"https://drive.google.com/file/d/1S3YmRd96-B3KS_6ViViWtB7OyNrQw2-J/view",t:"html5",mb:"~120MB"},
-  {n:"Subway Surfers: Miami",u:"https://drive.google.com/file/d/1Xd9itPeqqwiHb3eelYntyCVMbrOJ4gkE/view",t:"html5",mb:"~120MB"},
-  {n:"Sprunki",u:"https://drive.google.com/file/d/1AT7yMiig_G-e2J4JLMn8SgczIQgBTx0e/view",t:"html5",mb:"~22MB"},
-  {n:"Vampire Survivors",u:"https://drive.google.com/file/d/1fPT14ttfK4l5goO5SEm7fvk2JaGW2u8n/view",t:"html5",mb:"~80MB"},
-  {n:"Tiny Fishing",u:"https://drive.google.com/file/d/1aD6ayE0Mqzry0U-zO1qXqc3p_MCw1kqe/view",t:"html5",mb:"~6MB"},
-  {n:"Suika Game",u:"https://drive.google.com/file/d/1CHE1d9sGxq36ucsGtWpR59ybsNP9afYn/view",t:"html5",mb:"~12MB"},
-  {n:"Poly Track",u:"https://drive.google.com/file/d/1EpnALcD3vQAmUmLzuefCx-E2aau0x4LP/view",t:"html5",mb:"~28MB"},
-  {n:"Geometry Dash Lite",u:"https://drive.google.com/file/d/1jvsz_EmjOTwgCcfeyPtZCfXKJn9SD2bs/view",t:"html5",mb:"~20MB"},
-  {n:"Infinite Craft",u:"https://drive.google.com/file/d/1PsL3fGOAklgsVLV4Ticq3QGoG678QV2X/view",t:"html5",mb:"~5MB"},
-  {n:"Slow Roads",u:"https://drive.google.com/file/d/1i2Fnf6MikLJlZoLSCHckXEmA_P6ZWgrM/view",t:"html5",mb:"~10MB"},
-  {n:"Drift Hunters",u:"https://drive.google.com/file/d/1fUSbaLmNOmcVoGG3oXTopvxh-xMJeUv_/view",t:"html5",mb:"~45MB"},
-  {n:"Pizza Tower",u:"https://drive.google.com/file/d/1Ooqv4dWRWHjA_gsYjeBuPf4Hxgz9c-hl/view",t:"html5",mb:"~85MB"},
-  {n:"Backrooms",u:"https://drive.google.com/file/d/1sDmcbIS6Aw7713_diZ_Sos5hM4Vb_c1X/view",t:"html5",mb:"~18MB"},
-  {n:"Celeste Pico",u:"https://drive.google.com/file/d/1Ws1eKPbFaNchQTrSwNtUwgSlatU9GYSw/view",t:"html5",mb:"~5MB"},
-  {n:"Hollow Knight",u:"https://drive.google.com/file/d/19hU0AIFWdNwT48QVascDz1yA1RQ4WROR/view",t:"html5",mb:"~25MB"},
-  {n:"Melon Playground",u:"https://drive.google.com/file/d/1btZMMwyumRShvM4iKE2SqZEgi70wqe-X/view",t:"html5",mb:"~35MB"},
-  {n:"Stacky Dash",u:"https://drive.google.com/file/d/1IS41Lxh7Yuu4QZh7AcyhUGng_PuhwiEP/view",t:"html5",mb:"~8MB"},
-  {n:"Stickman Hook",u:"https://drive.google.com/file/d/1cpvQpnChRObc_S-QvQiqAGm1gjlBvlf8/view",t:"html5",mb:"~10MB"},
-  {n:"Wordle",u:"https://drive.google.com/file/d/15StKh4AkOPxjWOpWqZyT-6SbyIeP4ZAP/view",t:"html5",mb:"~2MB"},
-  {n:"Osu!",u:"https://drive.google.com/file/d/1Vw5Dp82gCqVMjYn8K2O5dlQSuUzX5J1T/view",t:"html5",mb:"~30MB"},
-  {n:"Ragdoll Archers",u:"https://drive.google.com/file/d/1IWsoFo_1HzgTOII6qVPQVsaYrchAG9vS/view",t:"html5",mb:"~14MB"},
-  {n:"Rolly Vortex",u:"https://drive.google.com/file/d/1DBThpNLGcbCQsNS_2oaUUyx4DKxpZ-UU/view",t:"html5",mb:"~7MB"},
-  {n:"Bounce Back",u:"https://drive.google.com/file/d/1J0twLMLM255S9hEUptVK9-LbWcVY3f5d/view",t:"html5",mb:"~6MB"},
-  {n:"Tanuki Sunset",u:"https://drive.google.com/file/d/1LoZvCKlrl0Ug2WAVacCXZRimOpHBJKNb/view",t:"html5",mb:"~25MB"},
-  {n:"Plinko",u:"https://drive.google.com/file/d/1IBmx5lSU86VfgQYzUCyTJvPxQbs82VuF/view",t:"html5",mb:"~4MB"},
-  {n:"Level Devil",u:"https://drive.google.com/file/d/1XujI67QSMHxadEWjw9lW6sS0iAqkBoti/view",t:"html5",mb:"~8MB"},
-  {n:"Solar Smash",u:"https://drive.google.com/file/d/1kTdjIQLimFHK1M3Xj3qzv93nsoCddlP5/view",t:"html5",mb:"~55MB"},
-  {n:"Granny",u:"https://drive.google.com/file/d/1loG5SS3R4bD-e45VW-wVfTxe4E6NcODd/view",t:"html5",mb:"~120MB"},
-  {n:"Granny 2",u:"https://drive.google.com/file/d/1FFhwgTSE17YocyoeJAjFLgtM39j5GmXt/view",t:"html5",mb:"~130MB"},
-  {n:"Granny 3",u:"https://drive.google.com/file/d/1lYJ3yzldT5rRcQplTUGO64Mmo5Bwban3/view",t:"html5",mb:"~140MB"},
-  {n:"Cluster Rush",u:"https://drive.google.com/file/d/1SZvQmIHn9H8T08W_CNK5ZrvVssTc2WKG/view",t:"html5",mb:"~25MB"},
-  {n:"Time Shooter 2",u:"https://drive.google.com/file/d/1ue5vdSn38hNtn1gfrVYdcIOJT2DjBN_c/view",t:"html5",mb:"~18MB"},
-  {n:"Time Shooter 3",u:"https://drive.google.com/file/d/1jncjCHd-2a0QFkp1tJevtpWkxH_nRlUm/view",t:"html5",mb:"~20MB"},
-  {n:"Scary Teacher 3D",u:"https://drive.google.com/file/d/1oI_zQ1ZejituIRyd8XI7mbSv8L7-TK84/view",t:"html5",mb:"~200MB"},
-  {n:"Pixel Warfare",u:"https://drive.google.com/file/d/1YAsZ6W7cTi42QG_zrnOgGLH_ulOyf19J/view",t:"html5",mb:"~30MB"},
-  {n:"Kour.io",u:"https://drive.google.com/file/d/1fTqYWvb5qSptsFFLZNjJm_313RZsUGr3/view",t:"html5",mb:"~40MB"},
-  {n:"State.io",u:"https://drive.google.com/file/d/1Pcs0tw4hZtvsG-3ay60nqUYFB4tS0QSx/view",t:"html5",mb:"~15MB"},
-  {n:"Paper.io",u:"https://drive.google.com/file/d/1zonzHKMOXWnkKS4q7OBQugKpHB8YIxAr/view",t:"html5",mb:"~10MB"},
-  {n:"Paper.io 3D",u:"https://drive.google.com/file/d/1vaSWsaIRMk6V9Hu1ImDjbSH3yjmlG8U5/view",t:"html5",mb:"~18MB"},
-  {n:"Slither.io",u:"https://drive.google.com/file/d/1ZPK56ffr7zlGEuBfZJH0VrWPBsoEYIC1/view",t:"html5",mb:"~8MB"},
-  {n:"Hole.io",u:"https://drive.google.com/file/d/1cYl47URR5mhH0m3p2TvvwUD3N1FoBU_y/view",t:"html5",mb:"~20MB"},
-  {n:"Territorial.io",u:"https://drive.google.com/file/d/1cV4PMPByp67qnxLasWfMdv5Xll56AqwJ/view",t:"html5",mb:"~5MB"},
-  {n:"Grow A Garden",u:"https://drive.google.com/file/d/1xCKB6yywnjMskWQeyBLMCJedZNOS9qIO/view",t:"html5",mb:"~35MB"},
-  {n:"Adventure Capitalist",u:"https://drive.google.com/file/d/16xb8cR1lk7OlwDOPMVCbcNrMDpOeJN0Z/view",t:"html5",mb:"~30MB"},
-  {n:"Idle Breakout",u:"https://drive.google.com/file/d/1OZ0h5Dx1CysK18k3Nw_ToOgGuwso5g6B/view",t:"html5",mb:"~4MB"},
-  {n:"Doge Miner 2",u:"https://drive.google.com/file/d/1GhQGUH6BM59QAbHNOoTrW7LaPpE183s6/view",t:"html5",mb:"~8MB"},
-  {n:"Capybara Clicker",u:"https://drive.google.com/file/d/19OYyqnexam2yvYIASmnKen9KszHQsBb7/view",t:"html5",mb:"~5MB"},
-  {n:"Sprunki Clicker",u:"https://drive.google.com/file/d/1MRnKq6C_9YIJUP-bRp0ko_BIAR097w1f/view",t:"html5",mb:"~6MB"},
-  {n:"Grow Your Garden",u:"https://drive.google.com/file/d/1LERs4b28Vz6ZJmhJF3CavK5aczv2ANUi/view",t:"html5",mb:"~40MB"},
-  {n:"Minecraft Classic",u:"https://classic.minecraft.net/",t:"html5",mb:"Online"},
-  {n:"Shell Shockers",u:"https://shellshock.io/",t:"html5",mb:"Online"},
-  {n:"Krunker.io",u:"https://krunker.io/",t:"html5",mb:"Online"},
-  {n:"Agar.io",u:"https://agar.io/",t:"html5",mb:"Online"},
-  {n:"Diep.io",u:"https://diep.io/",t:"html5",mb:"Online"},
-  {n:"Surviv.io",u:"https://survivio.com/",t:"html5",mb:"Online"},
-  {n:"Skribbl.io",u:"https://skribbl.io/",t:"html5",mb:"Online"},
-  {n:"Gartic Phone",u:"https://garticphone.com/",t:"html5",mb:"Online"},
-  {n:"Chess.com",u:"https://chess.com/",t:"html5",mb:"Online"},
-  {n:"Sudoku",u:"https://sudoku.com/",t:"html5",mb:"Online"},
-  {n:"Crossword",u:"https://www.nytimes.com/crosswords",t:"html5",mb:"Online"},
-  {n:"Connections (NYT)",u:"https://www.nytimes.com/games/connections",t:"html5",mb:"Online"},
-  {n:"Heardle",u:"https://www.spotify.com/heardle/",t:"html5",mb:"Online"},
-  // ── FNF ──
-  {n:"Friday Night Funkin'",u:"https://drive.google.com/file/d/1bF_gBLqInZQCBH80tPr0qVaWVWbnFgH_/view",t:"fnf",mb:"~80MB"},
-  {n:"FNF vs Whitty",u:"https://drive.google.com/file/d/1sKTnwyYoV3z01peJeoQoRX6NQEdTxwEu/view",t:"fnf",mb:"~50MB"},
-  {n:"FNF vs Shaggy",u:"https://drive.google.com/file/d/1I9DN4vVD4xca_dxoATHXk1aTdbMaXAh5/view",t:"fnf",mb:"~60MB"},
-  {n:"FNF vs Tricky",u:"https://drive.google.com/file/d/1XyFyiPL1T_7TjWwovpQt7PHEoFMJS7P3/view",t:"fnf",mb:"~55MB"},
-  {n:"FNF vs Sonic.EXE",u:"https://drive.google.com/file/d/11mrbdheaMxxOdMEx5DfYKsaqmrA0W3a4/view",t:"fnf",mb:"~70MB"},
-  {n:"FNF Indie Cross",u:"https://drive.google.com/file/d/1s7Li8L0qPsMSrCKV4d_rbG2-eOjvLS2r/view",t:"fnf",mb:"~90MB"},
-  {n:"FNF Mario's Madness",u:"https://drive.google.com/file/d/1Nh62GqauJXRwpzwcZT2f2xX5joNBljEL/view",t:"fnf",mb:"~100MB"},
-  {n:"FNF B-Sides",u:"https://drive.google.com/file/d/1EwIjqFJ0EzgZKsroSB0QYul972wsF9Q8/view",t:"fnf",mb:"~65MB"},
-  {n:"FNF Soft",u:"https://drive.google.com/file/d/1KaePbMxPHGyqpPcfRbnH94Zdq3mooypa/view",t:"fnf",mb:"~75MB"},
-  {n:"FNF Neo",u:"https://drive.google.com/file/d/1e8KWmlZRSXO5bMR9_88rdK1LB8YuKpPI/view",t:"fnf",mb:"~60MB"},
-  {n:"FNF Hex",u:"https://drive.google.com/file/d/1gmeiqKHuAATMGYPUg-e6r9GIz3HlO0B2/view",t:"fnf",mb:"~45MB"},
-  {n:"FNF vs QT",u:"https://drive.google.com/file/d/1DRY3NvwgtkjOWM0R_RGl3yg5j48xEyVo/view",t:"fnf",mb:"~50MB"},
-  {n:"FNF Mid-Fight Masses",u:"https://drive.google.com/file/d/1Ldjubnid7Xk6u9zLMm9yOkEN01l_Ds-j/view",t:"fnf",mb:"~55MB"},
-  {n:"FNF Dave & Bambi Golden Apple",u:"https://drive.google.com/file/d/1mK0hXsq6oaD_Xq8eGwPgiX7Pq4AcM7VF/view",t:"fnf",mb:"~120MB"},
-  {n:"FNF Impostor v4",u:"https://drive.google.com/file/d/1yVYZV7vd7vjdZ03KP4fqagwfsWZWirP4/view",t:"fnf",mb:"~80MB"},
-  {n:"FNF Wednesday's Infidelity",u:"https://drive.google.com/file/d/1a7PLzMl3Tr1w2stw3i7Sh-7euCYpXs_u/view",t:"fnf",mb:"~70MB"},
-  {n:"FNF Doki Takeover Plus",u:"https://drive.google.com/file/d/1zqu0hXWhIXia55OZPlWP3ju6bkv1jkBd/view",t:"fnf",mb:"~65MB"},
-  {n:"FNF Pibby Apocalypse",u:"https://drive.google.com/file/d/1hbx31DxmqalnhMm43mF0IXIFWfexVdgl/view",t:"fnf",mb:"~90MB"},
-  // ── FLASH (with Ruffle) ──
-  {n:"Happy Wheels",u:"https://drive.google.com/file/d/13jcuwX7tgPFaANNGs9RaSAJGZRqcVU_Q/view",t:"flash",mb:"~45MB"},
-  {n:"Bloons Tower Defense 4",u:"https://drive.google.com/file/d/1uqfn4suDW4dTyLZRHKaUR02gYqgwi310/view",t:"flash",mb:"~25MB"},
-  {n:"Super Smash Flash 2",u:"https://drive.google.com/file/d/1DPlZpUSPyMedJ5e67eQNtGLfJqc4vWUO/view",t:"flash",mb:"~120MB"},
-  {n:"Madness Combat",u:"https://drive.google.com/file/d/1axCZJlbkq08uN4oBibVoxpXrpsPUMhZ5/view",t:"flash",mb:"~15MB"},
-  {n:"Fireboy and Watergirl",u:"https://drive.google.com/file/d/1tAPh4rqRyCwNSd53FVugLM4ut1RfJYUN/view",t:"flash",mb:"~12MB"},
-  {n:"Fireboy and Watergirl 2",u:"https://drive.google.com/file/d/1vnVS7tMwgsBGM9GqCw3t3n7_RbYjbh-F/view",t:"flash",mb:"~14MB"},
-  {n:"Fireboy and Watergirl 3",u:"https://drive.google.com/file/d/1kY-7n3eBY3PXhBJhZ-O09fREip2OK42O/view",t:"flash",mb:"~16MB"},
-  {n:"Run",u:"https://drive.google.com/file/d/13S4hmU7QaqG-B6sykjngm3C7V6U4LTFV/view",t:"flash",mb:"~8MB"},
-  {n:"Run 2",u:"https://drive.google.com/file/d/1Ej0-flk1n-kPAJAHwQ7joXva9OWxhrUX/view",t:"flash",mb:"~10MB"},
-  {n:"Fancy Pants Adventure",u:"https://drive.google.com/file/d/13ay_YaJMC0ebn6MYAzUCyNOH4AcySg1K/view",t:"flash",mb:"~18MB"},
-  {n:"Fancy Pants Adventure 2",u:"https://drive.google.com/file/d/1aPjH0oBQ-lVX0EbdXjzsZo650j-TPN4p/view",t:"flash",mb:"~22MB"},
-  {n:"Hobo",u:"https://drive.google.com/file/d/1uF2V98tS6kkLDOga0sABRfHJnAcrCif3/view",t:"flash",mb:"~5MB"},
-  {n:"Hobo 2",u:"https://drive.google.com/file/d/1ZudXrrzTCNEUPZ8uZmJDp-8KWY7eSLlC/view",t:"flash",mb:"~6MB"},
-  {n:"The Impossible Quiz",u:"https://drive.google.com/file/d/1tsdgFWj2GIO6Uz8kvhmn4jLCP-Og2bqs/view",t:"flash",mb:"~8MB"},
-  {n:"The Impossible Quiz 2",u:"https://drive.google.com/file/d/16p1jhSzo3E9Z2QC2g_Egz-Q742W168pO/view",t:"flash",mb:"~10MB"},
-  {n:"Duck Life",u:"https://drive.google.com/file/d/1p4FeH2PoayIYm-CCmmy-Yqu3vaMvNW8Q/view",t:"flash",mb:"~6MB"},
-  {n:"Duck Life 4",u:"https://drive.google.com/file/d/1hWJeKydzTjqxNas7_SnGzkenIgWeVn0j/view",t:"flash",mb:"~10MB"},
-  {n:"Learn to Fly",u:"https://drive.google.com/file/d/1BBBHlTwi5L2_eeCvtDz8YmaJTJgaRIfo/view",t:"flash",mb:"~12MB"},
-  {n:"Learn to Fly 2",u:"https://drive.google.com/file/d/1_uuFKQTKHoHU0iMSUb7dr-wVmlXCYgAd/view",t:"flash",mb:"~15MB"},
-  {n:"Papa's Pizzeria",u:"https://drive.google.com/file/d/1OPC6NVM7j8Lq1p6_boBDhMW3Lg_kzxVy/view",t:"flash",mb:"~20MB"},
-  {n:"Papa's Burgeria",u:"https://drive.google.com/file/d/15Jwb266J7s5FILDsNWb27KnNXSandJft/view",t:"flash",mb:"~22MB"},
-  {n:"Papa's Freezeria",u:"https://drive.google.com/file/d/1TZ8kpLbFjjNPXlUt7BiXBSg6ksxotCas/view",t:"flash",mb:"~24MB"},
-  {n:"Papa's Cupcakeria",u:"https://drive.google.com/file/d/1T_MUl91rbVWi1iiki85gGQRKbJRbXyUf/view",t:"flash",mb:"~26MB"},
-  {n:"Papa's Sushiria",u:"https://drive.google.com/file/d/134hen0kTCX30MQ9Bnlt1ExYFSmh2_Pfx/view",t:"flash",mb:"~28MB"},
-  {n:"Papa's Pancakeria",u:"https://drive.google.com/file/d/1uxyQAfvwQNDkpik4E0vZSMOrlDXc4BHy/view",t:"flash",mb:"~24MB"},
-  {n:"Papa's Bakeria",u:"https://drive.google.com/file/d/1gMJph9k8xUi6xzP-RB3rCsYeydr9PGdL/view",t:"flash",mb:"~30MB"},
-  {n:"Parking Fury",u:"https://drive.google.com/file/d/1HBjsZIPWLUeE8Z1keWpSP0A3VpBph7nQ/view",t:"flash",mb:"~10MB"},
-  {n:"Parking Fury 2",u:"https://drive.google.com/file/d/1J6Itti_m1Bc3ArwnrKavdTZLQA7DO2Ig/view",t:"flash",mb:"~12MB"},
-  {n:"Parking Fury 3",u:"https://drive.google.com/file/d/1pA6ULV_d0lupUMyf_T0flqbYTtUx7dhj/view",t:"flash",mb:"~14MB"},
-  {n:"Bloons",u:"https://drive.google.com/file/d/1nZV5EWBBueJcw4dApBnGxXdgAIV5I_gY/view",t:"flash",mb:"~4MB"},
-  {n:"Bloons 2",u:"https://drive.google.com/file/d/1lvSIpgnEoQe8n02vlL21d4D1USwaFQBw/view",t:"flash",mb:"~6MB"},
-  {n:"BTD 1",u:"https://drive.google.com/file/d/1IuKZDCSQVze5l7wCrbTl602Jwcpg9u_U/view",t:"flash",mb:"~8MB"},
-  {n:"BTD 5",u:"https://drive.google.com/file/d/1ZDXA4Xj7ANbSPYXJFuZyNQu-iWFqdg5w/view",t:"flash",mb:"~40MB"},
-  {n:"Gun Mayhem",u:"https://drive.google.com/file/d/1jNWlbJxKQjKecqhDenKl5SJsSr_z5_dL/view",t:"flash",mb:"~18MB"},
-  {n:"Gun Mayhem 2",u:"https://drive.google.com/file/d/1mrLykWbOaYPZqZ63FLigOMURCfCjosCo/view",t:"flash",mb:"~22MB"},
-  {n:"Stick War",u:"https://drive.google.com/file/d/1c8SQxALNJs_p183PvBTw_IgauubkYnzs/view",t:"flash",mb:"~14MB"},
-  {n:"Stick War 2",u:"https://drive.google.com/file/d/1omhT1AU7M1Yi6p7zSIF1yvSdXoHLDj5r/view",t:"flash",mb:"~18MB"},
-  {n:"Age of War",u:"https://drive.google.com/file/d/1RGm7NZ_M3slV0fTSSRlTp3Rpg9fTzVPo/view",t:"flash",mb:"~10MB"},
-  {n:"Age of War 2",u:"https://drive.google.com/file/d/1YjMv3pjLUWqwNP2bFFGRW7AC9BTHBnxP/view",t:"flash",mb:"~12MB"},
-  {n:"Burrito Bison",u:"https://drive.google.com/file/d/1oRZP-GVLExFB1J1HAHSXJDtB6FEkqVBD/view",t:"flash",mb:"~18MB"},
-  {n:"Strike Force Heroes",u:"https://drive.google.com/file/d/165Bga2wlDBAwFXcch8CpjXDqrmx3pkmj/view",t:"flash",mb:"~25MB"},
-  {n:"Strike Force Heroes 2",u:"https://drive.google.com/file/d/141HLGoITLW-MJ2-SAVZ_DDe2bj6JqkhC/view",t:"flash",mb:"~30MB"},
-  {n:"Strike Force Heroes 3",u:"https://drive.google.com/file/d/1ApUllzz8sZZR0-SRTpW4XOQ71eg35_gc/view",t:"flash",mb:"~35MB"},
-  {n:"Jacksmith",u:"https://drive.google.com/file/d/1hSZR4OdVzKTrmCaITWkF060yswtsKAqT/view",t:"flash",mb:"~35MB"},
-  {n:"Riddle School",u:"https://drive.google.com/file/d/1K_bEEYnVCTWCD4614-RMP1J0A46rK2Dh/view",t:"flash",mb:"~5MB"},
-  {n:"Riddle School 2",u:"https://drive.google.com/file/d/1x2O0mXFqfzenkVNMO61gcGFIXW41iqkV/view",t:"flash",mb:"~6MB"},
-  {n:"Riddle School 3",u:"https://drive.google.com/file/d/14qvgIvJczf93IUOKdHkcNxsNN1RRYDdZ/view",t:"flash",mb:"~7MB"},
-  {n:"Swords and Sandals 2",u:"https://drive.google.com/file/d/1_J1y_DDSyc2HICQ_w7nSCdj7M9E5UPXF/view",t:"flash",mb:"~20MB"},
-  {n:"Swords and Souls",u:"https://drive.google.com/file/d/1tOECC-X_SIeNp6nJiUQJi4WuhJ2Oh0at/view",t:"flash",mb:"~22MB"},
-  {n:"Super Mario 63",u:"https://drive.google.com/file/d/1XW9eTDsp3Kw-KP05W9uvj0nNnrP-FJMr/view",t:"flash",mb:"~30MB"},
-  {n:"World's Hardest Game",u:"https://drive.google.com/file/d/1Z28_uRur7Zr1J03WS7b3zN1HSnGxpZ9g/view",t:"flash",mb:"~4MB"},
-  {n:"World's Hardest Game 2",u:"https://drive.google.com/file/d/18y2klLFyAfiyfkw3iFG2i9e1tYgeywSy/view",t:"flash",mb:"~5MB"},
-  {n:"Electric Man 2",u:"https://drive.google.com/file/d/1ZV9rmfv8b5R_su7RXVTU-bjF7Jkn0n-e/view",t:"flash",mb:"~8MB"},
-  {n:"Rebuild 2",u:"https://drive.google.com/file/d/1mNbj4sAfJoc4E9KYqpu-wuzjBLomhXAH/view",t:"flash",mb:"~15MB"},
-  {n:"Earn to Die",u:"https://drive.google.com/file/d/1waVfBJ_BPG1SbD_bARLJY_4TCyj7oP44/view",t:"flash",mb:"~12MB"},
-  {n:"Earn to Die 2",u:"https://drive.google.com/file/d/1caoA3Gw8pImRyBx_wwKP3r2Yvp-KOzS5/view",t:"flash",mb:"~14MB"},
-  {n:"The Last Stand 2",u:"https://drive.google.com/file/d/1mWHpcuGlV-k3q91Qs56o0wSns2zMX_hD/view",t:"flash",mb:"~20MB"},
-  {n:"The Last Stand: Union City",u:"https://drive.google.com/file/d/1Ut8MqzlAZ_MIElRK6BFBAkiIHIsr9SZy/view",t:"flash",mb:"~35MB"},
-  {n:"Troll Face Quest 1",u:"https://drive.google.com/file/d/17p5hkEVsOPIjmacP6mR7TUlFm2nCWCOA/view",t:"flash",mb:"~8MB"},
-  {n:"Troll Face Quest 2",u:"https://drive.google.com/file/d/1W7SBg26pV0YHHFq9fG1inE5rKneBsXut/view",t:"flash",mb:"~9MB"},
-  {n:"QWOP",u:"https://drive.google.com/file/d/1oAR0heli328tssjSI3uLFlsIZN2nkAMk/view",t:"flash",mb:"~3MB"},
-  {n:"Doodle Jump",u:"https://drive.google.com/file/d/1GkXZrRGxUwNT6wOtYASkt52AeKrgsaSP/view",t:"flash",mb:"~5MB"},
-  // ── EMULATED ──
-  {n:"Super Mario 64",u:"https://drive.google.com/file/d/1oJLeN8FFCe8ar9BG1Elv3yq086C0zgx0/view",t:"emulated",mb:"~64MB"},
-  {n:"Mario Kart 64",u:"https://drive.google.com/file/d/1pIk91DyxKya9V8Tnf7glHJiPx_1hJtDu/view",t:"emulated",mb:"~64MB"},
-  {n:"Super Smash Bros N64",u:"https://drive.google.com/file/d/1PbLO7YweOQCD-qhJk9mRf04RGL9ZHB2-/view",t:"emulated",mb:"~64MB"},
-  {n:"Ocarina of Time",u:"https://drive.google.com/file/d/1XtFCHCxF-EJmV_WPuNNy36b-pxwtL_OM/view",t:"emulated",mb:"~64MB"},
-  {n:"Majora's Mask",u:"https://drive.google.com/file/d/1QsMaIxjcFIq3m5AqI5ZDp_x9D0zIYr5X/view",t:"emulated",mb:"~64MB"},
-  {n:"Donkey Kong 64",u:"https://drive.google.com/file/d/1IKdiDcAHaQ1gL8LOD2SO_QdjgyM93daZ/view",t:"emulated",mb:"~64MB"},
-  {n:"Paper Mario N64",u:"https://drive.google.com/file/d/1fU26lMtjVkhMblDE6HLAN7akJ6rQjaGv/view",t:"emulated",mb:"~64MB"},
-  {n:"Banjo-Kazooie",u:"https://drive.google.com/file/d/1vF4VH8RToTVlH2fFYKzvHX9oRugE6iuE/view",t:"emulated",mb:"~64MB"},
-  {n:"GoldenEye 007",u:"https://drive.google.com/file/d/1OsSfhCVn3xwP5i9VyuIX7dyQeGUvs_jk/view",t:"emulated",mb:"~64MB"},
-  {n:"Pokemon FireRed",u:"https://drive.google.com/file/d/1zwiOplZkLN6cbHRVmfR2Wo72FEr7ROm2/view",t:"emulated",mb:"~16MB"},
-  {n:"Pokemon Emerald",u:"https://drive.google.com/file/d/1ucirKUZiBex2r-Ikc1qMYsPNG4_5VNjm/view",t:"emulated",mb:"~16MB"},
-  {n:"Pokemon Crystal",u:"https://drive.google.com/file/d/1lWPdHQWPUSRsX4PNNh6bMI_3OZPPlFud/view",t:"emulated",mb:"~8MB"},
-  {n:"Pokemon Platinum",u:"https://drive.google.com/file/d/12fXhRRDlpnM2jg4EABw-hJjSKWfZO6TU/view",t:"emulated",mb:"~64MB"},
-  {n:"Pokemon HeartGold",u:"https://drive.google.com/file/d/1QVyAHNyIeoDwLDF2iinjqXgRyOSb5aNA/view",t:"emulated",mb:"~128MB"},
-  {n:"Pokemon Black",u:"https://drive.google.com/file/d/1VrzlZrSBAjnajnjkcZMCq1WOdn6-biOm/view",t:"emulated",mb:"~128MB"},
-  {n:"Pokemon White",u:"https://drive.google.com/file/d/1NeNw61W3ScmC8v8UNRl9CiS-tD2nv20Z/view",t:"emulated",mb:"~128MB"},
-  {n:"Pokemon Unbound",u:"https://drive.google.com/file/d/1fa_3fMlkp355aNr_2tsUkp7zeJt4BWqW/view",t:"emulated",mb:"~16MB"},
-  {n:"Pokemon Radical Red",u:"https://drive.google.com/file/d/1Qw8TT81dTZM0xpIdOMKP-QZEPJeZ_8iC/view",t:"emulated",mb:"~16MB"},
-  {n:"Pokemon Emerald Rogue",u:"https://drive.google.com/file/d/1VfPiSK9VBShGNc6sP3ygsf7-GllYzpVN/view",t:"emulated",mb:"~16MB"},
-  {n:"Super Mario World",u:"https://drive.google.com/file/d/12TNnqSWbPP4ajakAygcIaFoIoeeyXmWf/view",t:"emulated",mb:"~8MB"},
-  {n:"Super Mario Bros 3",u:"https://drive.google.com/file/d/1q1SQdywOQBdU2GQOBh27mlgx9-cv3aUp/view",t:"emulated",mb:"~4MB"},
-  {n:"Donkey Kong Country",u:"https://drive.google.com/file/d/1qGhZTzI02T29zY7FJA4E75CzuUczUIBs/view",t:"emulated",mb:"~16MB"},
-  {n:"Donkey Kong Country 2",u:"https://drive.google.com/file/d/1IPMAT543CixI7ykybjWBWwGclgYjy9Y9/view",t:"emulated",mb:"~16MB"},
-  {n:"Chrono Trigger",u:"https://drive.google.com/file/d/1sKGyQTMKjeu93e5BYAGcfoAQXrz9dJP9/view",t:"emulated",mb:"~32MB"},
-  {n:"Super Metroid",u:"https://drive.google.com/file/d/1BCWTEhty4o2a0M5xWMdM7LwMgomf55bf/view",t:"emulated",mb:"~16MB"},
-  {n:"Kirby Super Star",u:"https://drive.google.com/file/d/15T1rBO-xuh-6eRFll6epZIVtDb_9ztnU/view",t:"emulated",mb:"~16MB"},
-  {n:"New Super Mario Bros DS",u:"https://drive.google.com/file/d/1uyQvi1CGGe9I_WPAfu16hjBvF-1e5I4M/view",t:"emulated",mb:"~64MB"},
-  {n:"Mario Kart DS",u:"https://drive.google.com/file/d/1s7m935WOWN1EM6EB8buUid7bbZxKsPa_/view",t:"emulated",mb:"~64MB"},
-  {n:"Mario & Luigi: Bowser's Inside Story",u:"https://drive.google.com/file/d/1Oe9IoD8oI7mF1BPwMjC8-z2iJkLwoE4Q/view",t:"emulated",mb:"~64MB"},
-  {n:"Sonic the Hedgehog",u:"https://drive.google.com/file/d/1fZZt54aoygf1qkGsYB3HUeHSeQ1nSNcC/view",t:"emulated",mb:"~4MB"},
-  {n:"Sonic the Hedgehog 2",u:"https://drive.google.com/file/d/1dBlhwOV8eLiTJ_GRRksCOUSBp6mgUZxJ/view",t:"emulated",mb:"~4MB"},
-  {n:"Sonic 3 & Knuckles",u:"https://drive.google.com/file/d/1wgAxyed2gJgekM4eXlkah1uyj47NnZPj/view",t:"emulated",mb:"~8MB"},
-  {n:"Final Fantasy VII",u:"https://drive.google.com/file/d/13wJl_6BtOljdKG0pbyUWAh-DOAWWtCTm/view",t:"emulated",mb:"~650MB"},
-  {n:"Crash Bandicoot PS1",u:"https://drive.google.com/file/d/1g_zqgSDEI8Ggh2uzXhsL6zw1d2wsSCYH/view",t:"emulated",mb:"~500MB"},
-  {n:"Mortal Kombat 4",u:"https://drive.google.com/file/d/1xHAKZNMXW6y7ff5s9Aa4CxZjAPr9A6ku/view",t:"emulated",mb:"~500MB"},
-  {n:"Doom (MS-DOS)",u:"https://drive.google.com/file/d/1nb8YlAFYC1s_UiuZXCFzYXazyzqK8IPx/view",t:"emulated",mb:"~12MB"},
-  {n:"Mega Man X",u:"https://drive.google.com/file/d/15zESqXlKbzX3fK9vQnJk224yEQQilE08/view",t:"emulated",mb:"~8MB"},
-  {n:"Mega Man 2",u:"https://drive.google.com/file/d/1ROtEyjHy6J0zWRu65V3heeuQulD-CyUc/view",t:"emulated",mb:"~4MB"},
-  {n:"Metroid Fusion",u:"https://drive.google.com/file/d/1W_jrXR-6G25iA74adLHX3uNf4SGvV0pW/view",t:"emulated",mb:"~8MB"},
-  {n:"Castlevania: SOTN",u:"https://drive.google.com/file/d/1ON-bB9HDnzASMscToCBLEf-DxqtRZ-bc/view",t:"emulated",mb:"~500MB"},
-  {n:"Kirby 64",u:"https://drive.google.com/file/d/1MvGfK7rtC4NVpUmQuz-SGXRyRNKrQR4F/view",t:"emulated",mb:"~64MB"},
-  {n:"Star Fox 64",u:"https://drive.google.com/file/d/1jWumZ8K20tDPLzTXyb9AHB424KOrub1X/view",t:"emulated",mb:"~64MB"},
-  {n:"Animal Crossing DS",u:"https://drive.google.com/file/d/1yZQZqOO-wR6cMpPMshVmyckanhcJMI2j/view",t:"emulated",mb:"~64MB"},
+// ── SETTINGS ──
+function openSettings(){document.getElementById('sov').classList.add('open');}
+function closeSett(){document.getElementById('sov').classList.remove('open');}
+document.getElementById('sov').addEventListener('click',function(e){if(e.target===this)closeSett();});
+function setTheme(cls,el){
+  document.body.className=cls?'theme-'+cls:'';
+  document.querySelectorAll('.tc').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  localStorage.setItem('mgs3-theme',cls);
+}
+const st=localStorage.getItem('mgs3-theme');
+if(st){document.body.className=st?'theme-'+st:'';const el=document.getElementById('t-'+(st||'dark'));if(el){document.querySelectorAll('.tc').forEach(c=>c.classList.remove('on'));el.classList.add('on');}}
+
+// ── GAME DATA ──
+const EMOJI={html5:'🖥',flash:'⚡',emulated:'🕹',fnf:'🎵',pokemon:'⚾'};
+const GAMES=[
+  {n:"Baldi's Basics",u:"https://drive.google.com/file/d/1UeCBcErh14gonxfw0y2amxbrqZfrttKj/view",t:"html5",mb:"~15MB",e:"🏫"},
+  {n:"Basket Bros",u:"https://drive.google.com/file/d/1R6OCaS56zMHchP9zsHbxeFXx-3SsPuAU/view",t:"html5",mb:"~20MB",e:"🏀"},
+  {n:"Basket Random",u:"https://drive.google.com/file/d/1mq1psi8_H4jyQslycPGSR-dbkWJ1QAW9/view",t:"html5",mb:"~12MB",e:"🏀"},
+  {n:"Tomb of the Mask",u:"https://drive.google.com/file/d/1uCr1KuIfZ46DJeOX92ZYY2nlyQ6ulPcs/view",t:"html5",mb:"~18MB",e:"💀"},
+  {n:"BitLife",u:"https://drive.google.com/file/d/1qdHWXaWjyk4wvpxf9q6S-lQP9X0DhsTA/view",t:"html5",mb:"~40MB",e:"👤"},
+  {n:"Escape Road",u:"https://drive.google.com/file/d/14vjJbM91SrRGqic6DG9CqQ5r5NPKEzMo/view",t:"html5",mb:"~22MB",e:"🚗"},
+  {n:"Escape Road 2",u:"https://drive.google.com/file/d/1T5niOq0TmVrDCucQruTIlqF7BpxCdTEY/view",t:"html5",mb:"~28MB",e:"🚗"},
+  {n:"Drive Mad",u:"https://drive.google.com/file/d/1_U2IKm5-MY5hUROiO46BaOWy81ym_yhr/view",t:"html5",mb:"~18MB",e:"🚙"},
+  {n:"Crazy Cattle 3D",u:"https://drive.google.com/file/d/1l9yA5vMAqkcrH8Jua2LEnD-s-wTIFZ0R/view",t:"html5",mb:"~55MB",e:"🐄"},
+  {n:"Cookie Clicker",u:"https://drive.google.com/file/d/1kDlM4BCzn7TMezp94VWPL5RhbFXZIwf-/view",t:"html5",mb:"~8MB",e:"🍪"},
+  {n:"Burrito Bison",u:"https://drive.google.com/file/d/1Mvs0de1vB6AtPBHYUpYVaXzUmt2D9QtY/view",t:"html5",mb:"~30MB",e:"🌯"},
+  {n:"Rooftop Snipers",u:"https://drive.google.com/file/d/1RSrgfX1zyTi5GsOCkBWDqyG7q3FMzPBW/view",t:"html5",mb:"~10MB",e:"🔫"},
+  {n:"Rooftop Snipers 2",u:"https://drive.google.com/file/d/1lDDh7QA5LaA0cfLmeTXvtf3pjvtFOGZ3/view",t:"html5",mb:"~12MB",e:"🔫"},
+  {n:"Retro Bowl",u:"https://drive.google.com/file/d/1U0oR-obhfztS7tMeA1wTirCYeKD_f7_a/view",t:"html5",mb:"~14MB",e:"🏈"},
+  {n:"Snow Rider 3D",u:"https://drive.google.com/file/d/1LEYD8dy6nt7zpBHsO0OPN56efXn7L419/view",t:"html5",mb:"~35MB",e:"⛷"},
+  {n:"Run 3",u:"https://drive.google.com/file/d/18vF8LB5DpPYIaZ_UarNOcxyx044gu19o/view",t:"html5",mb:"~28MB",e:"🏃"},
+  {n:"Slope",u:"https://drive.google.com/file/d/1csdFwFf5p_De_IadUUVXVGl0h3ivFD63/view",t:"html5",mb:"~12MB",e:"🔴"},
+  {n:"Slope 3",u:"https://drive.google.com/file/d/18IWxc8OY4eBwMGlJ0a5A2uK_-l8KI6au/view",t:"html5",mb:"~16MB",e:"🔴"},
+  {n:"Doki Doki Literature Club",u:"https://drive.google.com/file/d/1uj9FGWBCSbYlE687dedSZEO1pF4e6iRC/view",t:"html5",mb:"~200MB",e:"🌸"},
+  {n:"Deltarune",u:"https://drive.google.com/file/d/1Z8whTWE02uB9hEga3jaW6AkQhzEaFGKh/view",t:"html5",mb:"~180MB",e:"🔷"},
+  {n:"Dreadhead Parkour",u:"https://drive.google.com/file/d/1g_1WN6LNM1q5drv-cUTiUk09Y3ZwnM6p/view",t:"html5",mb:"~22MB",e:"🧗"},
+  {n:"1v1.lol",u:"https://drive.google.com/file/d/16SVHF4XRFjv5WCqlLHJZhF6nkBM7q4ex/view",t:"html5",mb:"~45MB",e:"⚔"},
+  {n:"2048",u:"https://drive.google.com/file/d/13xSrRMeCad0nyxRTPaaTQIMzVHk5Cd_s/view",t:"html5",mb:"~1MB",e:"🔢"},
+  {n:"Smash Karts",u:"https://drive.google.com/file/d/1Xz6hyYp4-ckBrkDa8mdVqPeC1nwMljyg/view",t:"html5",mb:"~65MB",e:"🏎"},
+  {n:"Getaway Shootout",u:"https://drive.google.com/file/d/14B32tBAhluuDTRg0oYHuQykADNN0LUTD/view",t:"html5",mb:"~14MB",e:"💨"},
+  {n:"OVO",u:"https://drive.google.com/file/d/1Uqan3Lv0gldfyBGp6QY6_q0HZmLuU30d/view",t:"html5",mb:"~6MB",e:"🥚"},
+  {n:"Moto X3M",u:"https://drive.google.com/file/d/1R-J62MHWd7po7gRHGOitewZ3qPs1vGEj/view",t:"html5",mb:"~22MB",e:"🏍"},
+  {n:"Moto X3M Pool Party",u:"https://drive.google.com/file/d/1pop0WjnfTm59i3fek4CE5xfDga_HVDDM/view",t:"html5",mb:"~28MB",e:"🏊"},
+  {n:"Tunnel Rush",u:"https://drive.google.com/file/d/1oOts85wAfZNzl0rLOl1azcMB9cWfd6ws/view",t:"html5",mb:"~8MB",e:"🌀"},
+  {n:"Vex 5",u:"https://drive.google.com/file/d/1D-705UyHXz6UWCnpgNL123tMIDoy0Q7C/view",t:"html5",mb:"~18MB",e:"🧱"},
+  {n:"Vex 6",u:"https://drive.google.com/file/d/1vOmwZHRpz_4nUGf_VKW01mjt6nOiOWf5/view",t:"html5",mb:"~20MB",e:"🧱"},
+  {n:"House of Hazards",u:"https://drive.google.com/file/d/1pwmfcL73hVdjuqO8sFOKCRsuLzT6YPjL/view",t:"html5",mb:"~30MB",e:"🏠"},
+  {n:"Drift Boss",u:"https://drive.google.com/file/d/1UNbv-2GnAKy5AHvuRUCRy9E6mBuDmywM/view",t:"html5",mb:"~15MB",e:"🚗"},
+  {n:"Drift Hunters",u:"https://drive.google.com/file/d/1fUSbaLmNOmcVoGG3oXTopvxh-xMJeUv_/view",t:"html5",mb:"~45MB",e:"💨"},
+  {n:"Sprunki",u:"https://drive.google.com/file/d/1AT7yMiig_G-e2J4JLMn8SgczIQgBTx0e/view",t:"html5",mb:"~22MB",e:"🎵"},
+  {n:"Vampire Survivors",u:"https://drive.google.com/file/d/1fPT14ttfK4l5goO5SEm7fvk2JaGW2u8n/view",t:"html5",mb:"~80MB",e:"🧛"},
+  {n:"Suika Game",u:"https://drive.google.com/file/d/1CHE1d9sGxq36ucsGtWpR59ybsNP9afYn/view",t:"html5",mb:"~12MB",e:"🍉"},
+  {n:"Poly Track",u:"https://drive.google.com/file/d/1EpnALcD3vQAmUmLzuefCx-E2aau0x4LP/view",t:"html5",mb:"~28MB",e:"🏁"},
+  {n:"Geometry Dash Lite",u:"https://drive.google.com/file/d/1jvsz_EmjOTwgCcfeyPtZCfXKJn9SD2bs/view",t:"html5",mb:"~20MB",e:"🔺"},
+  {n:"Infinite Craft",u:"https://drive.google.com/file/d/1PsL3fGOAklgsVLV4Ticq3QGoG678QV2X/view",t:"html5",mb:"~5MB",e:"⚗"},
+  {n:"Pizza Tower",u:"https://drive.google.com/file/d/1Ooqv4dWRWHjA_gsYjeBuPf4Hxgz9c-hl/view",t:"html5",mb:"~85MB",e:"🍕"},
+  {n:"Celeste Pico",u:"https://drive.google.com/file/d/1Ws1eKPbFaNchQTrSwNtUwgSlatU9GYSw/view",t:"html5",mb:"~5MB",e:"🏔"},
+  {n:"Melon Playground",u:"https://drive.google.com/file/d/1btZMMwyumRShvM4iKE2SqZEgi70wqe-X/view",t:"html5",mb:"~35MB",e:"🍈"},
+  {n:"Wordle",u:"https://drive.google.com/file/d/15StKh4AkOPxjWOpWqZyT-6SbyIeP4ZAP/view",t:"html5",mb:"~2MB",e:"🔤"},
+  {n:"Osu!",u:"https://drive.google.com/file/d/1Vw5Dp82gCqVMjYn8K2O5dlQSuUzX5J1T/view",t:"html5",mb:"~30MB",e:"⭕"},
+  {n:"Ragdoll Archers",u:"https://drive.google.com/file/d/1IWsoFo_1HzgTOII6qVPQVsaYrchAG9vS/view",t:"html5",mb:"~14MB",e:"🏹"},
+  {n:"Tanuki Sunset",u:"https://drive.google.com/file/d/1LoZvCKlrl0Ug2WAVacCXZRimOpHBJKNb/view",t:"html5",mb:"~25MB",e:"🦝"},
+  {n:"Level Devil",u:"https://drive.google.com/file/d/1XujI67QSMHxadEWjw9lW6sS0iAqkBoti/view",t:"html5",mb:"~8MB",e:"😈"},
+  {n:"Solar Smash",u:"https://drive.google.com/file/d/1kTdjIQLimFHK1M3Xj3qzv93nsoCddlP5/view",t:"html5",mb:"~55MB",e:"💥"},
+  {n:"Cluster Rush",u:"https://drive.google.com/file/d/1SZvQmIHn9H8T08W_CNK5ZrvVssTc2WKG/view",t:"html5",mb:"~25MB",e:"🚛"},
+  {n:"Time Shooter 2",u:"https://drive.google.com/file/d/1ue5vdSn38hNtn1gfrVYdcIOJT2DjBN_c/view",t:"html5",mb:"~18MB",e:"⏱"},
+  {n:"Among Us",u:"https://drive.google.com/file/d/1ZCT6pr5pp3ci0-qKWjH1ccJ9N-bF5KWL/view",t:"html5",mb:"~40MB",e:"👾"},
+  {n:"Superhot",u:"https://drive.google.com/file/d/1_50-Aite2TsrxM6UmFCuIwaVe2nDyzD_/view",t:"html5",mb:"~30MB",e:"🔴"},
+  {n:"Pixel Warfare",u:"https://drive.google.com/file/d/1YAsZ6W7cTi42QG_zrnOgGLH_ulOyf19J/view",t:"html5",mb:"~30MB",e:"🎮"},
+  {n:"Kour.io",u:"https://drive.google.com/file/d/1fTqYWvb5qSptsFFLZNjJm_313RZsUGr3/view",t:"html5",mb:"~40MB",e:"🎯"},
+  {n:"Slither.io",u:"https://drive.google.com/file/d/1ZPK56ffr7zlGEuBfZJH0VrWPBsoEYIC1/view",t:"html5",mb:"~8MB",e:"🐍"},
+  {n:"Territorial.io",u:"https://drive.google.com/file/d/1cV4PMPByp67qnxLasWfMdv5Xll56AqwJ/view",t:"html5",mb:"~5MB",e:"🗺"},
+  {n:"Idle Breakout",u:"https://drive.google.com/file/d/1OZ0h5Dx1CysK18k3Nw_ToOgGuwso5g6B/view",t:"html5",mb:"~4MB",e:"🧱"},
+  {n:"Capybara Clicker",u:"https://drive.google.com/file/d/19OYyqnexam2yvYIASmnKen9KszHQsBb7/view",t:"html5",mb:"~5MB",e:"🐾"},
+  {n:"Eaglercraft 1.8.8",u:"https://drive.google.com/file/d/1lIdSb3tzNxKQexKBLLM6m4CjaJbqUCCZ/view",t:"html5",mb:"~25MB",e:"⛏"},
+  {n:"Sandboxels",u:"https://drive.google.com/file/d/1MQM0bfDkGpdXja1xH05tIUDsnTM30tHg/view",t:"html5",mb:"~6MB",e:"🏖"},
+  {n:"Subway Surfers London",u:"https://drive.google.com/file/d/17ys8g9hw7rrVAebugJdPUDnvczx-gHxc/view",t:"html5",mb:"~120MB",e:"🚇"},
+  {n:"A Dance Of Fire And Ice",u:"https://drive.google.com/file/d/1STu3mHiTbsOGiMHgXjXM_SzurGLV17TA/view",t:"html5",mb:"~25MB",e:"🔥"},
+  // FNF
+  {n:"Friday Night Funkin'",u:"https://drive.google.com/file/d/1bF_gBLqInZQCBH80tPr0qVaWVWbnFgH_/view",t:"fnf",mb:"~80MB",e:"🎵"},
+  {n:"FNF vs Whitty",u:"https://drive.google.com/file/d/1sKTnwyYoV3z01peJeoQoRX6NQEdTxwEu/view",t:"fnf",mb:"~50MB",e:"💣"},
+  {n:"FNF vs Shaggy",u:"https://drive.google.com/file/d/1I9DN4vVD4xca_dxoATHXk1aTdbMaXAh5/view",t:"fnf",mb:"~60MB",e:"🐕"},
+  {n:"FNF vs Tricky",u:"https://drive.google.com/file/d/1XyFyiPL1T_7TjWwovpQt7PHEoFMJS7P3/view",t:"fnf",mb:"~55MB",e:"🤡"},
+  {n:"FNF vs Sonic.EXE",u:"https://drive.google.com/file/d/11mrbdheaMxxOdMEx5DfYKsaqmrA0W3a4/view",t:"fnf",mb:"~70MB",e:"💙"},
+  {n:"FNF Indie Cross",u:"https://drive.google.com/file/d/1s7Li8L0qPsMSrCKV4d_rbG2-eOjvLS2r/view",t:"fnf",mb:"~90MB",e:"✝"},
+  {n:"FNF Mario's Madness",u:"https://drive.google.com/file/d/1Nh62GqauJXRwpzwcZT2f2xX5joNBljEL/view",t:"fnf",mb:"~100MB",e:"🍄"},
+  {n:"FNF B-Sides",u:"https://drive.google.com/file/d/1EwIjqFJ0EzgZKsroSB0QYul972wsF9Q8/view",t:"fnf",mb:"~65MB",e:"🎶"},
+  {n:"FNF Soft",u:"https://drive.google.com/file/d/1KaePbMxPHGyqpPcfRbnH94Zdq3mooypa/view",t:"fnf",mb:"~75MB",e:"🌸"},
+  {n:"FNF vs Garcello",u:"https://drive.google.com/file/d/1fyHIQqbvXgdzbPflq6JL3pJh_Qy79TeL/view",t:"fnf",mb:"~45MB",e:"🚬"},
+  {n:"FNF Wednesday's Infidelity",u:"https://drive.google.com/file/d/1a7PLzMl3Tr1w2stw3i7Sh-7euCYpXs_u/view",t:"fnf",mb:"~70MB",e:"📅"},
+  {n:"FNF Pibby Apocalypse",u:"https://drive.google.com/file/d/1hbx31DxmqalnhMm43mF0IXIFWfexVdgl/view",t:"fnf",mb:"~90MB",e:"🌀"},
+  // FLASH
+  {n:"Happy Wheels",u:"https://drive.google.com/file/d/13jcuwX7tgPFaANNGs9RaSAJGZRqcVU_Q/view",t:"flash",mb:"~45MB",e:"🩸"},
+  {n:"Super Smash Flash 2",u:"https://drive.google.com/file/d/1DPlZpUSPyMedJ5e67eQNtGLfJqc4vWUO/view",t:"flash",mb:"~120MB",e:"👊"},
+  {n:"Fireboy & Watergirl",u:"https://drive.google.com/file/d/1tAPh4rqRyCwNSd53FVugLM4ut1RfJYUN/view",t:"flash",mb:"~12MB",e:"🔥"},
+  {n:"The Impossible Quiz",u:"https://drive.google.com/file/d/1tsdgFWj2GIO6Uz8kvhmn4jLCP-Og2bqs/view",t:"flash",mb:"~8MB",e:"❓"},
+  {n:"Duck Life 4",u:"https://drive.google.com/file/d/1hWJeKydzTjqxNas7_SnGzkenIgWeVn0j/view",t:"flash",mb:"~10MB",e:"🦆"},
+  {n:"Learn to Fly 2",u:"https://drive.google.com/file/d/1_uuFKQTKHoHU0iMSUb7dr-wVmlXCYgAd/view",t:"flash",mb:"~15MB",e:"🐧"},
+  {n:"Papa's Pizzeria",u:"https://drive.google.com/file/d/1OPC6NVM7j8Lq1p6_boBDhMW3Lg_kzxVy/view",t:"flash",mb:"~20MB",e:"🍕"},
+  {n:"Papa's Freezeria",u:"https://drive.google.com/file/d/1TZ8kpLbFjjNPXlUt7BiXBSg6ksxotCas/view",t:"flash",mb:"~24MB",e:"🍦"},
+  {n:"Papa's Burgeria",u:"https://drive.google.com/file/d/15Jwb266J7s5FILDsNWb27KnNXSandJft/view",t:"flash",mb:"~22MB",e:"🍔"},
+  {n:"BTD 4",u:"https://drive.google.com/file/d/1uqfn4suDW4dTyLZRHKaUR02gYqgwi310/view",t:"flash",mb:"~25MB",e:"🎈"},
+  {n:"BTD 5",u:"https://drive.google.com/file/d/1ZDXA4Xj7ANbSPYXJFuZyNQu-iWFqdg5w/view",t:"flash",mb:"~40MB",e:"🎈"},
+  {n:"Gun Mayhem 2",u:"https://drive.google.com/file/d/1mrLykWbOaYPZqZ63FLigOMURCfCjosCo/view",t:"flash",mb:"~22MB",e:"🔫"},
+  {n:"Stick War",u:"https://drive.google.com/file/d/1c8SQxALNJs_p183PvBTw_IgauubkYnzs/view",t:"flash",mb:"~14MB",e:"⚔"},
+  {n:"Age of War",u:"https://drive.google.com/file/d/1RGm7NZ_M3slV0fTSSRlTp3Rpg9fTzVPo/view",t:"flash",mb:"~10MB",e:"🏛"},
+  {n:"Strike Force Heroes 2",u:"https://drive.google.com/file/d/141HLGoITLW-MJ2-SAVZ_DDe2bj6JqkhC/view",t:"flash",mb:"~30MB",e:"🪖"},
+  {n:"Jacksmith",u:"https://drive.google.com/file/d/1hSZR4OdVzKTrmCaITWkF060yswtsKAqT/view",t:"flash",mb:"~35MB",e:"🔨"},
+  {n:"Swords and Souls",u:"https://drive.google.com/file/d/1tOECC-X_SIeNp6nJiUQJi4WuhJ2Oh0at/view",t:"flash",mb:"~22MB",e:"⚔"},
+  {n:"World's Hardest Game",u:"https://drive.google.com/file/d/1Z28_uRur7Zr1J03WS7b3zN1HSnGxpZ9g/view",t:"flash",mb:"~4MB",e:"🟥"},
+  {n:"QWOP",u:"https://drive.google.com/file/d/1oAR0heli328tssjSI3uLFlsIZN2nkAMk/view",t:"flash",mb:"~3MB",e:"🏃"},
+  {n:"Earn to Die 2",u:"https://drive.google.com/file/d/1caoA3Gw8pImRyBx_wwKP3r2Yvp-KOzS5/view",t:"flash",mb:"~14MB",e:"🚗"},
+  {n:"Plants vs Zombies",u:"https://drive.google.com/file/d/1EyKS9D2Uk8gTm0szulOgI7cvkC6piGM-/view",t:"flash",mb:"~40MB",e:"🌻"},
+  {n:"Cactus McCoy",u:"https://drive.google.com/file/d/19_-uKBUGWdZZro7cbIlXaO2-iYqjWUVY/view",t:"flash",mb:"~20MB",e:"🌵"},
+  {n:"Burrito Bison (Flash)",u:"https://drive.google.com/file/d/1oRZP-GVLExFB1J1HAHSXJDtB6FEkqVBD/view",t:"flash",mb:"~18MB",e:"🌯"},
+  {n:"Hobo 3",u:"https://drive.google.com/file/d/1ppY4s_mae3jZwIwoHlVvwYCb-3xa2Lar/view",t:"flash",mb:"~7MB",e:"🧑"},
+  // POKEMON
+  {n:"Pokemon FireRed",u:"https://drive.google.com/file/d/1zwiOplZkLN6cbHRVmfR2Wo72FEr7ROm2/view",t:"pokemon",mb:"~16MB",e:"🔴"},
+  {n:"Pokemon Emerald",u:"https://drive.google.com/file/d/1ucirKUZiBex2r-Ikc1qMYsPNG4_5VNjm/view",t:"pokemon",mb:"~16MB",e:"💚"},
+  {n:"Pokemon Crystal",u:"https://drive.google.com/file/d/1lWPdHQWPUSRsX4PNNh6bMI_3OZPPlFud/view",t:"pokemon",mb:"~8MB",e:"💎"},
+  {n:"Pokemon Gold",u:"https://drive.google.com/file/d/1IMwqDToavWybcrY_bLbY4TBWZ4DUyFOU/view",t:"pokemon",mb:"~8MB",e:"🏅"},
+  {n:"Pokemon Platinum",u:"https://drive.google.com/file/d/12fXhRRDlpnM2jg4EABw-hJjSKWfZO6TU/view",t:"pokemon",mb:"~64MB",e:"⚪"},
+  {n:"Pokemon HeartGold",u:"https://drive.google.com/file/d/1QVyAHNyIeoDwLDF2iinjqXgRyOSb5aNA/view",t:"pokemon",mb:"~128MB",e:"❤"},
+  {n:"Pokemon Black",u:"https://drive.google.com/file/d/1VrzlZrSBAjnajnjkcZMCq1WOdn6-biOm/view",t:"pokemon",mb:"~128MB",e:"⬛"},
+  {n:"Pokemon White",u:"https://drive.google.com/file/d/1NeNw61W3ScmC8v8UNRl9CiS-tD2nv20Z/view",t:"pokemon",mb:"~128MB",e:"⬜"},
+  {n:"Pokemon Unbound",u:"https://drive.google.com/file/d/1fa_3fMlkp355aNr_2tsUkp7zeJt4BWqW/view",t:"pokemon",mb:"~16MB",e:"🔓"},
+  {n:"Pokemon Radical Red",u:"https://drive.google.com/file/d/1Qw8TT81dTZM0xpIdOMKP-QZEPJeZ_8iC/view",t:"pokemon",mb:"~16MB",e:"❤"},
+  {n:"Pokemon Emerald Rogue",u:"https://drive.google.com/file/d/1VfPiSK9VBShGNc6sP3ygsf7-GllYzpVN/view",t:"pokemon",mb:"~16MB",e:"🃏"},
+  {n:"Pokemon Clover",u:"https://drive.google.com/file/d/1T4h2I6hY0jDGtjmm6ow0xDbyXo-sz2tC/view",t:"pokemon",mb:"~16MB",e:"🍀"},
+  {n:"Pokemon Quetzal",u:"https://drive.google.com/file/d/1Z_nCqHtTlqKt8G6Hlp27uox5u0M_9F62/view",t:"pokemon",mb:"~16MB",e:"🐦"},
+  {n:"Pokemon Mystery Dungeon",u:"https://drive.google.com/file/d/1bD6aHzqAucFy7Hp71NOn5fIY3V9-azxt/view",t:"pokemon",mb:"~32MB",e:"🌀"},
+  // EMULATED
+  {n:"Super Mario 64",u:"https://drive.google.com/file/d/1oJLeN8FFCe8ar9BG1Elv3yq086C0zgx0/view",t:"emulated",mb:"~64MB",e:"⭐"},
+  {n:"Mario Kart 64",u:"https://drive.google.com/file/d/1pIk91DyxKya9V8Tnf7glHJiPx_1hJtDu/view",t:"emulated",mb:"~64MB",e:"🏎"},
+  {n:"Ocarina of Time",u:"https://drive.google.com/file/d/1XtFCHCxF-EJmV_WPuNNy36b-pxwtL_OM/view",t:"emulated",mb:"~64MB",e:"🎵"},
+  {n:"Majora's Mask",u:"https://drive.google.com/file/d/1QsMaIxjcFIq3m5AqI5ZDp_x9D0zIYr5X/view",t:"emulated",mb:"~64MB",e:"🌕"},
+  {n:"Super Smash Bros N64",u:"https://drive.google.com/file/d/1PbLO7YweOQCD-qhJk9mRf04RGL9ZHB2-/view",t:"emulated",mb:"~64MB",e:"👊"},
+  {n:"Goldeneye 007",u:"https://drive.google.com/file/d/1OsSfhCVn3xwP5i9VyuIX7dyQeGUvs_jk/view",t:"emulated",mb:"~64MB",e:"🔫"},
+  {n:"Banjo-Kazooie",u:"https://drive.google.com/file/d/1vF4VH8RToTVlH2fFYKzvHX9oRugE6iuE/view",t:"emulated",mb:"~64MB",e:"🐻"},
+  {n:"Paper Mario N64",u:"https://drive.google.com/file/d/1fU26lMtjVkhMblDE6HLAN7akJ6rQjaGv/view",t:"emulated",mb:"~64MB",e:"📄"},
+  {n:"Super Mario World",u:"https://drive.google.com/file/d/12TNnqSWbPP4ajakAygcIaFoIoeeyXmWf/view",t:"emulated",mb:"~8MB",e:"🍄"},
+  {n:"Donkey Kong Country",u:"https://drive.google.com/file/d/1qGhZTzI02T29zY7FJA4E75CzuUczUIBs/view",t:"emulated",mb:"~16MB",e:"🦍"},
+  {n:"Chrono Trigger",u:"https://drive.google.com/file/d/1sKGyQTMKjeu93e5BYAGcfoAQXrz9dJP9/view",t:"emulated",mb:"~32MB",e:"⏳"},
+  {n:"Super Metroid",u:"https://drive.google.com/file/d/1BCWTEhty4o2a0M5xWMdM7LwMgomf55bf/view",t:"emulated",mb:"~16MB",e:"🚀"},
+  {n:"Mega Man X",u:"https://drive.google.com/file/d/15zESqXlKbzX3fK9vQnJk224yEQQilE08/view",t:"emulated",mb:"~8MB",e:"🤖"},
+  {n:"New Super Mario Bros DS",u:"https://drive.google.com/file/d/1uyQvi1CGGe9I_WPAfu16hjBvF-1e5I4M/view",t:"emulated",mb:"~64MB",e:"🍄"},
+  {n:"Mario Kart DS",u:"https://drive.google.com/file/d/1s7m935WOWN1EM6EB8buUid7bbZxKsPa_/view",t:"emulated",mb:"~64MB",e:"🏎"},
+  {n:"Sonic the Hedgehog",u:"https://drive.google.com/file/d/1fZZt54aoygf1qkGsYB3HUeHSeQ1nSNcC/view",t:"emulated",mb:"~4MB",e:"💙"},
+  {n:"Sonic 3 & Knuckles",u:"https://drive.google.com/file/d/1wgAxyed2gJgekM4eXlkah1uyj47NnZPj/view",t:"emulated",mb:"~8MB",e:"💙"},
+  {n:"Doom (MS-DOS)",u:"https://drive.google.com/file/d/1nb8YlAFYC1s_UiuZXCFzYXazyzqK8IPx/view",t:"emulated",mb:"~12MB",e:"👹"},
+  {n:"Star Fox 64",u:"https://drive.google.com/file/d/1jWumZ8K20tDPLzTXyb9AHB424KOrub1X/view",t:"emulated",mb:"~64MB",e:"🦊"},
+  {n:"Kirby Super Star",u:"https://drive.google.com/file/d/15T1rBO-xuh-6eRFll6epZIVtDb_9ztnU/view",t:"emulated",mb:"~16MB",e:"🌟"},
+  {n:"Final Fantasy VII",u:"https://drive.google.com/file/d/13wJl_6BtOljdKG0pbyUWAh-DOAWWtCTm/view",t:"emulated",mb:"~650MB",e:"⚔"},
+  {n:"Mortal Kombat SNES",u:"https://drive.google.com/file/d/1rOzt1xOzXR4fn9YJ18NlagGskt3wzg-7/view",t:"emulated",mb:"~16MB",e:"🩸"},
+  {n:"Streets of Rage 2",u:"https://drive.google.com/file/d/1Nd8EWA-nk4NHyZYuzU46WGTlSBo5IK7A/view",t:"emulated",mb:"~4MB",e:"🥊"},
 ];
 
-// ═══════════════════════════════════════════════════════
-//  MUSIC PLAYER
-// ═══════════════════════════════════════════════════════
-const tracks = [
-  { title:"Geometry Dash - Stereo Madness", src:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
-  { title:"Chill Lo-Fi Beats", src:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
-  { title:"Cyberpunk Vibes", src:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
-  { title:"Electronic Dreams", src:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" },
-  { title:"Space Ambience", src:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3" },
-  { title:"Mars Station Radio", src:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3" },
-  { title:"Retro Wave", src:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3" },
-  { title:"Boss Battle Theme", src:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" },
-];
-let curTrack = 0, isPlaying = false, shuffle = false, loop = false;
-const audio = document.getElementById('audio-player');
+// ── STATE ──
+let filtered=[], idx=0, curFilter='all', curSearch='';
 
-function initPlayer() {
-  const tl = document.getElementById('track-list');
-  tl.innerHTML = tracks.map((t,i) => `
-    <div class="track-item${i===curTrack?' playing':''}" id="ti-${i}" onclick="playTrack(${i})">
-      <span class="track-num">${i+1}</span>
-      <div class="vis-bars" style="width:18px;height:16px">
-        <div class="vis-bar" style="height:4px"></div>
-        <div class="vis-bar" style="height:4px"></div>
-        <div class="vis-bar" style="height:4px"></div>
-      </div>
-      <span class="track-name">${t.title}</span>
-    </div>
-  `).join('');
-  audio.src = tracks[curTrack].src;
-  audio.volume = 0.7;
-  audio.addEventListener('timeupdate', updateProgress);
-  audio.addEventListener('ended', onEnded);
+function setF(f,el){
+  curFilter=f;
+  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  idx=0;render();
 }
+function onSearch(){curSearch=document.getElementById('search').value.toLowerCase();idx=0;render();}
 
-function playTrack(i) {
-  curTrack = i;
-  audio.src = tracks[i].src;
-  audio.play(); isPlaying = true;
-  document.getElementById('play-btn').textContent = '⏸';
-  document.getElementById('np-title').textContent = tracks[i].title;
-  document.querySelectorAll('.track-item').forEach((el,j) => {
-    el.classList.toggle('playing', j===i);
-    const bars = el.querySelectorAll('.vis-bar');
-    bars.forEach(b => { b.style.animation = j===i ? '' : 'none'; b.style.height = j===i ? '' : '4px'; });
+function getFiltered(){
+  return GAMES.filter(g=>{
+    const mf=curFilter==='all'||g.t===curFilter;
+    const ms=!curSearch||g.n.toLowerCase().includes(curSearch);
+    return mf&&ms;
   });
-  document.getElementById('vis-bars').querySelectorAll('.vis-bar').forEach(b => b.style.animation='visBounce 0.6s ease-in-out infinite');
 }
 
-function togglePlay() {
-  if(isPlaying) { audio.pause(); isPlaying=false; document.getElementById('play-btn').textContent='▶'; document.getElementById('vis-bars').querySelectorAll('.vis-bar').forEach(b=>b.style.animation='none'); }
-  else { audio.play(); isPlaying=true; document.getElementById('play-btn').textContent='⏸'; document.getElementById('vis-bars').querySelectorAll('.vis-bar').forEach(b=>b.style.animation='visBounce 0.6s ease-in-out infinite'); }
+// ── RENDER CARDS ──
+function render(){
+  filtered=getFiltered();
+  document.getElementById('cnt').textContent=filtered.length;
+  const track=document.getElementById('track');
+  track.innerHTML='';
+  if(!filtered.length){track.innerHTML='<div style="font-family:Share Tech Mono,monospace;color:var(--dim);letter-spacing:2px;">NO GAMES FOUND</div>';return;}
+  filtered.forEach((g,i)=>{
+    const c=document.createElement('div');
+    c.className='gc'+(i===idx?' sel':i===idx-1?' left-adj':i===idx+1?' right-adj':'');
+    c.dataset.i=i;
+    c.innerHTML=`
+      <div class="gc-art">
+        <div class="gc-art-inner">${g.e||'🎮'}</div>
+        <div class="gc-tag">${g.t.toUpperCase()}</div>
+      </div>
+      <div class="gc-info">
+        <div class="gc-name">${g.n}</div>
+        <div class="gc-size">${g.mb}</div>
+        <div class="gc-enter">▶ PRESS ENTER</div>
+      </div>`;
+    c.addEventListener('click',()=>{if(parseInt(c.dataset.i)===idx){openGame();}else{idx=parseInt(c.dataset.i);updateSel();}});
+    track.appendChild(c);
+  });
+  scrollToSel();
 }
 
-function nextTrack() {
-  const n = shuffle ? Math.floor(Math.random()*tracks.length) : (curTrack+1)%tracks.length;
-  playTrack(n);
-}
-function prevTrack() { playTrack((curTrack-1+tracks.length)%tracks.length); }
-function toggleShuffle() { shuffle=!shuffle; document.getElementById('shuffle-btn').classList.toggle('active',shuffle); }
-function toggleLoop() { loop=!loop; audio.loop=loop; document.getElementById('loop-btn').classList.toggle('active',loop); }
-function setVol(v) { audio.volume=v; }
-
-function updateProgress() {
-  if(!audio.duration) return;
-  const pct = (audio.currentTime/audio.duration)*100;
-  document.getElementById('prog-fill').style.width=pct+'%';
-  document.getElementById('time-cur').textContent=fmtTime(audio.currentTime);
-  document.getElementById('time-dur').textContent=fmtTime(audio.duration);
-}
-function fmtTime(s) { const m=Math.floor(s/60); return m+':'+(Math.floor(s%60)+'').padStart(2,'0'); }
-function seekTo(e) { const bar=document.getElementById('prog-bar'); audio.currentTime=(e.offsetX/bar.offsetWidth)*audio.duration; }
-function onEnded() { if(!loop) nextTrack(); }
-
-function toggleMusic() {
-  const p = document.getElementById('music-player');
-  if(!p.classList.contains('open') && !p.classList.contains('mini')) { p.classList.add('mini'); }
-  else p.classList.toggle('open');
-}
-function toggleMusicExpand() {
-  const p = document.getElementById('music-player');
-  p.classList.toggle('open');
-  p.classList.toggle('mini', !p.classList.contains('open'));
+function updateSel(){
+  document.querySelectorAll('.gc').forEach((c,i)=>{
+    c.className='gc'+(i===idx?' sel':i===idx-1?' left-adj':i===idx+1?' right-adj':'');
+    c.dataset.i=i;
+  });
+  scrollToSel();
 }
 
-// ═══════════════════════════════════════════════════════
-//  SETTINGS
-// ═══════════════════════════════════════════════════════
-function openSettings() {
-  document.getElementById('settings-panel').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function closeSettings() {
-  document.getElementById('settings-panel').classList.remove('open');
-  document.body.style.overflow = '';
-}
-function applySettings() {
-  const title = document.getElementById('s-tab-title').value.trim() || 'Google Classroom';
-  const favicon = document.getElementById('s-favicon').value.trim();
-  document.title = title;
-  if(favicon) {
-    let link = document.querySelector("link[rel~='icon']");
-    if(!link){ link=document.createElement('link'); link.rel='icon'; document.head.appendChild(link); }
-    link.href = favicon;
-  }
-  localStorage.setItem('mgs-settings', JSON.stringify({ title, favicon }));
-  showToast('Settings saved!');
-}
-function loadSettings() {
-  try {
-    const s = JSON.parse(localStorage.getItem('mgs-settings') || '{}');
-    if(s.title) { document.getElementById('s-tab-title').value = s.title; document.title = s.title; }
-    if(s.favicon) { document.getElementById('s-favicon').value = s.favicon; }
-  } catch(e){}
-}
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2200);
+function scrollToSel(){
+  const stage=document.getElementById('stage');
+  const track=document.getElementById('track');
+  const cards=track.querySelectorAll('.gc');
+  if(!cards[idx])return;
+  const cardW=220+28; // card width + gap
+  const stageW=stage.offsetWidth;
+  const offset=(stageW/2)-(cardW*idx)-(220/2);
+  track.style.transform=`translateX(${offset}px)`;
 }
 
-// ═══════════════════════════════════════════════════════
-//  DRIVE URL CONVERTER
-// ═══════════════════════════════════════════════════════
-function getDriveDirectURL(url) {
-  // Convert /file/d/ID/view  →  uc?export=download&id=ID&confirm=t
-  const m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-  if(m) return `https://drive.google.com/uc?export=download&id=${m[1]}&confirm=t`;
-  return url;
-}
-
-// ═══════════════════════════════════════════════════════
-//  GAME LAUNCHING — fetch + write to about:blank (like UGS method)
-// ═══════════════════════════════════════════════════════
-let currentGame = null;
-
-function openGame(url, name, type) {
-  currentGame = {url, name, type};
-
-  // For online (non-drive) games open directly
-  if(!url.includes('drive.google.com')) {
-    launchInWindow(url, name);
+// ── KEYBOARD ──
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('ls').classList.contains('gone')===false)return;
+  if(document.getElementById('launch').classList.contains('open')){
+    if(e.key==='Escape')closeLaunch();
     return;
   }
-
-  const directURL = getDriveDirectURL(url);
-
-  // Show loading toast
-  showToast('Loading ' + name + '...');
-
-  // Fetch the single-file HTML from Drive and inject into about:blank
-  fetch(directURL + '&t=' + Date.now())
-    .then(r => {
-      if(!r.ok) throw new Error('Drive fetch failed: ' + r.status);
-      return r.text();
-    })
-    .then(html => {
-      const newWin = window.open('about:blank', '_blank');
-      if(!newWin) { alert('Allow popups to play games!'); return; }
-      newWin.document.open();
-      newWin.document.write(html);
-      newWin.document.close();
-      newWin.document.title = name;
-    })
-    .catch(err => {
-      console.warn('Fetch failed, falling back to preview embed:', err);
-      // Fallback: open Google Drive preview in new tab
-      const m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-      if(m) {
-        window.open(`https://drive.google.com/file/d/${m[1]}/preview`, '_blank');
-      } else {
-        window.open(url, '_blank');
-      }
-    });
-}
-
-function launchInWindow(url, name) {
-  const newWin = window.open('about:blank', '_blank');
-  if(!newWin) { window.open(url, '_blank'); return; }
-  newWin.document.open();
-  newWin.document.write(`<!DOCTYPE html><html><head><title>${name}</title>
-  <style>*{margin:0;padding:0;box-sizing:border-box}body{background:#000;display:flex;flex-direction:column;height:100vh;overflow:hidden}
-  #bar{background:#111;border-bottom:1px solid #222;padding:6px 12px;display:flex;align-items:center;gap:10px;font-family:monospace;font-size:12px;color:#555;flex-shrink:0}
-  #bar span{color:#e63946;font-weight:bold}button{margin-left:auto;background:#e63946;border:none;color:#fff;font-size:11px;padding:4px 10px;cursor:pointer;font-family:monospace}
-  iframe{flex:1;width:100%;border:none}</style></head><body>
-  <div id="bar"><span>▶ ${name}</span><button onclick="window.close()">✕ CLOSE</button></div>
-  <iframe src="${url}" allowfullscreen allow="fullscreen *"></iframe>
-  </body></html>`);
-  newWin.document.close();
-}
-
-function closeModal() {
-  document.getElementById('game-modal').classList.remove('open');
-  document.getElementById('game-frame').src = '';
-  document.getElementById('ruffle-container').innerHTML = '';
-  document.body.style.overflow = '';
-}
-
-function reloadGame() {
-  if(!currentGame) return;
-  openGame(currentGame.url, currentGame.name, currentGame.type);
-}
-
-function modalFullscreen() {
-  const mc = document.querySelector('.modal-content');
-  if(mc.requestFullscreen) mc.requestFullscreen();
-  else if(mc.webkitRequestFullscreen) mc.webkitRequestFullscreen();
-}
-
-// ═══════════════════════════════════════════════════════
-//  HTML RUNNER
-// ═══════════════════════════════════════════════════════
-function openHTMLRunner() { document.getElementById('html-runner').classList.add('open'); document.body.style.overflow='hidden'; }
-function closeHTMLRunner() { document.getElementById('html-runner').classList.remove('open'); document.body.style.overflow=''; }
-function runHTML() {
-  const code = document.getElementById('html-editor').value;
-  const preview = document.getElementById('html-preview');
-  preview.srcdoc = code;
-}
-function clearEditor() {
-  document.getElementById('html-editor').value = '';
-  document.getElementById('html-preview').srcdoc = '';
-}
-function fullscreenPreview() {
-  const preview = document.getElementById('html-preview');
-  if(preview.requestFullscreen) preview.requestFullscreen();
-  else if(preview.webkitRequestFullscreen) preview.webkitRequestFullscreen();
-  else if(preview.mozRequestFullScreen) preview.mozRequestFullScreen();
-}
-// Tab key in editor
-document.getElementById('html-editor').addEventListener('keydown', e => {
-  if(e.key==='Tab') { e.preventDefault(); const s=e.target.selectionStart; e.target.value=e.target.value.substring(0,s)+'  '+e.target.value.substring(e.target.selectionEnd); e.target.selectionStart=e.target.selectionEnd=s+2; }
+  if(document.getElementById('sov').classList.contains('open')){
+    if(e.key==='Escape')closeSett();
+    return;
+  }
+  if(e.key==='ArrowRight'&&idx<filtered.length-1){idx++;updateSel();e.preventDefault();}
+  else if(e.key==='ArrowLeft'&&idx>0){idx--;updateSel();e.preventDefault();}
+  else if(e.key==='Enter'){openGame();e.preventDefault();}
+  else if(e.key==='Escape'){closeLaunch();}
 });
 
-// ═══════════════════════════════════════════════════════
-//  PROXY PANEL
-// ═══════════════════════════════════════════════════════
-let activeProxyTab = 'helios';
-function openProxy() { document.getElementById('proxy-panel').classList.add('open'); document.body.style.overflow='hidden'; }
-function closeProxy() { document.getElementById('proxy-panel').classList.remove('open'); document.body.style.overflow=''; }
-function showProxyTab(tab, el) {
-  activeProxyTab = tab;
-  document.querySelectorAll('.proxy-content').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.proxy-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('proxy-'+tab).classList.add('active');
-  el.classList.add('active');
+// ── OPEN GAME ──
+function openGame(){
+  if(!filtered[idx])return;
+  const g=filtered[idx];
+  document.getElementById('launch-title').textContent='▶ '+g.n;
+  document.getElementById('launch-frame').src=g.u;
+  document.getElementById('launch').classList.add('open');
 }
-function loadProxy(tab) {
-  const inputs = {helios:'proxy-url', sandstone:'proxy-url-2', ultraviolet:'proxy-url-3', rammerhead:'proxy-url-4'};
-  const frames = {helios:'proxy-frame-helios', sandstone:'proxy-frame-sandstone', ultraviolet:'proxy-frame-ultraviolet', rammerhead:'proxy-frame-rammerhead'};
-  const url = document.getElementById(inputs[tab]).value;
-  document.getElementById(frames[tab]).src = url;
+function closeLaunch(){
+  document.getElementById('launch').classList.remove('open');
+  document.getElementById('launch-frame').src='about:blank';
 }
 
-// ═══════════════════════════════════════════════════════
-//  GAME GRID
-// ═══════════════════════════════════════════════════════
-let currentFilter = 'all', currentSearch = '';
-const tagLabels = {html5:'HTML5',flash:'Flash ⚡',emulated:'Emulated',fnf:'FNF'};
+// ── RESIZE ──
+window.addEventListener('resize',scrollToSel);
 
-function setFilter(f, el) {
-  currentFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
-  renderGames();
-}
-function filterGames() { currentSearch=document.getElementById('search').value.toLowerCase(); renderGames(); }
-
-function renderGames() {
-  const grid = document.getElementById('game-grid');
-  const noR = document.getElementById('no-results');
-  const filtered = games.filter(g => {
-    return (currentFilter==='all'||g.t===currentFilter) && (!currentSearch||g.n.toLowerCase().includes(currentSearch));
-  });
-  document.getElementById('count').textContent = filtered.length;
-  if(!filtered.length) { grid.innerHTML=''; noR.classList.add('show'); return; }
-  noR.classList.remove('show');
-  grid.innerHTML = filtered.map((g,i) => `
-    <a class="game-card" href="#" onclick="event.preventDefault();openGame('${g.u.replace(/'/g,"\\'")}','${g.n.replace(/'/g,"\\'")}','${g.t}');" style="animation-delay:${Math.min(i*0.015,0.4)}s">
-      <div class="card-tooltip">
-        <span class="tooltip-title">${g.n}</span>
-        <span class="tooltip-size">Size: ${g.mb} | ${tagLabels[g.t]||g.t}</span>
-      </div>
-      <div class="card-body">
-        <div class="card-name">${g.n}</div>
-        <div class="card-tag">${tagLabels[g.t]||g.t}</div>
-      </div>
-    </a>
-  `).join('');
-}
-
-// ═══════════════════════════════════════════════════════
-//  INIT
-// ═══════════════════════════════════════════════════════
-window.addEventListener('load', () => {
-  // Restore theme
-  const saved = localStorage.getItem('mgs-theme');
-  if(saved) {
-    setTheme(saved, document.querySelector(`.theme-option[data-theme="${saved}"]`));
-  }
-  loadSettings();
-  renderGames();
-  initPlayer();
-
-  // Panic key listener
-  document.addEventListener('keydown', e => {
-    const key = document.getElementById('s-panic-key')?.value || 'Escape';
-    const dest = document.getElementById('s-panic-dest')?.value || 'https://classroom.google.com';
-    if(e.key === key) { window.location.href = dest; }
-  });
-
-  setTimeout(() => {
-    const l = document.getElementById('loader-overlay');
-    l.classList.add('hidden');
-    setTimeout(()=>l.remove(), 600);
-  }, 1400);
+// ── LOADER / INIT ──
+window.addEventListener('load',()=>{
+  // slight delay to let fonts load
+  setTimeout(()=>{ document.querySelectorAll('#stage,#search-wrap,#bot,#hdr').forEach(el=>el.style.visibility='visible'); },100);
 });
-  // ═══════════════════════════════════════════════════════
-//  DRIVE PREFETCH PATCH — paste at end of <script>, before </script>
-//  Rewrites every openGame call to fetch Drive HTML and inject
-//  into about:blank, including Ruffle/Flash games.
-// ═══════════════════════════════════════════════════════
-
-function getFileId(url) {
-  const m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-  return m ? m[1] : null;
-}
-
-function fetchAndLaunch(url, name, type) {
-  const fileId = getFileId(url);
-  if (!fileId) { launchInWindow(url, name); return; }
-
-  const directURL = `https://drive.google.com/uc?export=download&id=${fileId}&confirm=t&t=${Date.now()}`;
-  showToast('Fetching ' + name + '...');
-
-  fetch(directURL)
-    .then(r => {
-      if (!r.ok) throw new Error(r.status);
-      // For Flash/Ruffle: get as ArrayBuffer so binary data is intact
-      if (type === 'flash') return r.arrayBuffer().then(buf => ({ buf, isFlash: true }));
-      return r.text().then(text => ({ text, isFlash: false }));
-    })
-    .then(result => {
-      const newWin = window.open('about:blank', '_blank');
-      if (!newWin) { alert('Allow popups to play games!'); return; }
-
-      if (result.isFlash) {
-        // Inject Ruffle + serve the .swf via a blob URL
-        const swfBlob = new Blob([result.buf], { type: 'application/x-shockwave-flash' });
-        const swfURL  = URL.createObjectURL(swfBlob);
-
-        newWin.document.open();
-        newWin.document.write(`<!DOCTYPE html><html><head>
-          <title>${name}</title>
-          <script src="https://unpkg.com/@ruffle-rs/ruffle"><\/script>
-          <style>*{margin:0;padding:0;box-sizing:border-box}
-          body{background:#000;display:flex;flex-direction:column;height:100vh;overflow:hidden}
-          #bar{background:#111;border-bottom:1px solid #222;padding:6px 12px;display:flex;
-               align-items:center;font-family:monospace;font-size:12px;color:#555;flex-shrink:0}
-          #bar span{color:#e63946;font-weight:bold;flex:1}
-          button{background:#e63946;border:none;color:#fff;font-size:11px;
-                 padding:4px 10px;cursor:pointer;font-family:monospace}
-          ruffle-player{flex:1;width:100%;display:block}</style>
-        </head><body>
-          <div id="bar"><span>▶ ${name}</span>
-            <button onclick="window.close()">✕ CLOSE</button></div>
-          <script>
-            window.addEventListener('load', () => {
-              const ruffle = window.RufflePlayer.newest();
-              const player = ruffle.createPlayer();
-              player.style.flex = '1';
-              player.style.width = '100%';
-              document.body.appendChild(player);
-              player.load('${swfURL}');
-            });
-          <\/script>
-        </body></html>`);
-        newWin.document.close();
-
-      } else {
-        // HTML5 / single-file game — write raw HTML directly
-        newWin.document.open();
-        newWin.document.write(result.text);
-        newWin.document.close();
-        try { newWin.document.title = name; } catch(e) {}
-      }
-
-      showToast(name + ' launched!');
-    })
-    .catch(err => {
-      console.warn('fetchAndLaunch failed:', err);
-      showToast('Falling back to preview...');
-      // Fallback: Drive preview embed in a clean window
-      const newWin = window.open('about:blank', '_blank');
-      if (!newWin) return;
-      const fileId2 = getFileId(url);
-      newWin.document.open();
-      newWin.document.write(`<!DOCTYPE html><html><head><title>${name}</title>
-        <style>*{margin:0;padding:0}body{background:#000;display:flex;flex-direction:column;height:100vh}
-        #bar{background:#111;padding:6px 12px;display:flex;align-items:center;font-family:monospace;font-size:12px;color:#555;flex-shrink:0}
-        #bar span{color:#e63946;font-weight:bold;flex:1}button{background:#e63946;border:none;color:#fff;padding:4px 10px;cursor:pointer;font-family:monospace}
-        iframe{flex:1;border:none}</style></head><body>
-        <div id="bar"><span>▶ ${name}</span><button onclick="window.close()">✕ CLOSE</button></div>
-        <iframe src="https://drive.google.com/file/d/${fileId2}/preview" allowfullscreen></iframe>
-        </body></html>`);
-      newWin.document.close();
-    });
-}
-
-// ── Patch: override openGame to always use fetchAndLaunch for Drive URLs ──
-const _originalOpenGame = openGame;
-window.openGame = function(url, name, type) {
-  if (url.includes('drive.google.com')) {
-    fetchAndLaunch(url, name, type);
-  } else {
-    _originalOpenGame(url, name, type);
-  }
-};
-// ═══════════════════════════════════════════════════════
-//  DRIVE PREFETCH PATCH — paste at end of <script>, before </script>
-//  Rewrites every openGame call to fetch Drive HTML and inject
-//  into about:blank, including Ruffle/Flash games.
-// ═══════════════════════════════════════════════════════
-
-function getFileId(url) {
-  const m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-  return m ? m[1] : null;
-}
-
-function fetchAndLaunch(url, name, type) {
-  const fileId = getFileId(url);
-  if (!fileId) { launchInWindow(url, name); return; }
-
-  const directURL = `https://drive.google.com/uc?export=download&id=${fileId}&confirm=t&t=${Date.now()}`;
-  showToast('Fetching ' + name + '...');
-
-  fetch(directURL)
-    .then(r => {
-      if (!r.ok) throw new Error(r.status);
-      // For Flash/Ruffle: get as ArrayBuffer so binary data is intact
-      if (type === 'flash') return r.arrayBuffer().then(buf => ({ buf, isFlash: true }));
-      return r.text().then(text => ({ text, isFlash: false }));
-    })
-    .then(result => {
-      const newWin = window.open('about:blank', '_blank');
-      if (!newWin) { alert('Allow popups to play games!'); return; }
-
-      if (result.isFlash) {
-        // Inject Ruffle + serve the .swf via a blob URL
-        const swfBlob = new Blob([result.buf], { type: 'application/x-shockwave-flash' });
-        const swfURL  = URL.createObjectURL(swfBlob);
-
-        newWin.document.open();
-        newWin.document.write(`<!DOCTYPE html><html><head>
-          <title>${name}</title>
-          <script src="https://unpkg.com/@ruffle-rs/ruffle"><\/script>
-          <style>*{margin:0;padding:0;box-sizing:border-box}
-          body{background:#000;display:flex;flex-direction:column;height:100vh;overflow:hidden}
-          #bar{background:#111;border-bottom:1px solid #222;padding:6px 12px;display:flex;
-               align-items:center;font-family:monospace;font-size:12px;color:#555;flex-shrink:0}
-          #bar span{color:#e63946;font-weight:bold;flex:1}
-          button{background:#e63946;border:none;color:#fff;font-size:11px;
-                 padding:4px 10px;cursor:pointer;font-family:monospace}
-          ruffle-player{flex:1;width:100%;display:block}</style>
-        </head><body>
-          <div id="bar"><span>▶ ${name}</span>
-            <button onclick="window.close()">✕ CLOSE</button></div>
-          <script>
-            window.addEventListener('load', () => {
-              const ruffle = window.RufflePlayer.newest();
-              const player = ruffle.createPlayer();
-              player.style.flex = '1';
-              player.style.width = '100%';
-              document.body.appendChild(player);
-              player.load('${swfURL}');
-            });
-          <\/script>
-        </body></html>`);
-        newWin.document.close();
-
-      } else {
-        // HTML5 / single-file game — write raw HTML directly
-        newWin.document.open();
-        newWin.document.write(result.text);
-        newWin.document.close();
-        try { newWin.document.title = name; } catch(e) {}
-      }
-
-      showToast(name + ' launched!');
-    })
-    .catch(err => {
-      console.warn('fetchAndLaunch failed:', err);
-      showToast('Falling back to preview...');
-      // Fallback: Drive preview embed in a clean window
-      const newWin = window.open('about:blank', '_blank');
-      if (!newWin) return;
-      const fileId2 = getFileId(url);
-      newWin.document.open();
-      newWin.document.write(`<!DOCTYPE html><html><head><title>${name}</title>
-        <style>*{margin:0;padding:0}body{background:#000;display:flex;flex-direction:column;height:100vh}
-        #bar{background:#111;padding:6px 12px;display:flex;align-items:center;font-family:monospace;font-size:12px;color:#555;flex-shrink:0}
-        #bar span{color:#e63946;font-weight:bold;flex:1}button{background:#e63946;border:none;color:#fff;padding:4px 10px;cursor:pointer;font-family:monospace}
-        iframe{flex:1;border:none}</style></head><body>
-        <div id="bar"><span>▶ ${name}</span><button onclick="window.close()">✕ CLOSE</button></div>
-        <iframe src="https://drive.google.com/file/d/${fileId2}/preview" allowfullscreen></iframe>
-        </body></html>`);
-      newWin.document.close();
-    });
-}
-
-// ── Patch: override openGame to always use fetchAndLaunch for Drive URLs ──
-const _originalOpenGame = openGame;
-window.openGame = function(url, name, type) {
-  if (url.includes('drive.google.com')) {
-    fetchAndLaunch(url, name, type);
-  } else {
-    _originalOpenGame(url, name, type);
-  }
-};
 </script>
 </body>
 </html>
-
