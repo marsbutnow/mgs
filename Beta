@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mars Game Stash</title>
+<script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+/* ═══ THEMES ═══ */
+:root,[data-theme="mars"]{--bg:#080b14;--bg2:#0d1220;--card:#0f1627;--card-hover:#162035;--a1:#e63946;--a2:#00d4ff;--a3:#ff6b35;--text:#c8d6e5;--dim:#5a7a9a;--border:#1a2a40;--glow:rgba(0,212,255,0.15);--glow-red:rgba(230,57,70,0.2);--scan:rgba(0,0,0,0.03);}
+[data-theme="neon"]{--bg:#050510;--bg2:#08081a;--card:#0a0a20;--card-hover:#10102a;--a1:#ff00ff;--a2:#00ffaa;--a3:#ffff00;--text:#e0e0ff;--dim:#5050aa;--border:#1a1a40;--glow:rgba(0,255,170,0.15);--glow-red:rgba(255,0,255,0.2);--scan:rgba(0,0,0,0.04);}
+[data-theme="hacker"]{--bg:#000500;--bg2:#010801;--card:#020c02;--card-hover:#041204;--a1:#00ff41;--a2:#00cc33;--a3:#39ff14;--text:#00ff41;--dim:#006614;--border:#003300;--glow:rgba(0,255,65,0.15);--glow-red:rgba(0,255,65,0.2);--scan:rgba(0,0,0,0.06);}
+[data-theme="abyss"]{--bg:#02020a;--bg2:#05050f;--card:#07071a;--card-hover:#0c0c22;--a1:#7b2fff;--a2:#ff2fff;--a3:#2fffff;--text:#c5b8ff;--dim:#4a3a80;--border:#1a1040;--glow:rgba(123,47,255,0.15);--glow-red:rgba(255,47,255,0.2);--scan:rgba(0,0,0,0.04);}
+[data-theme="ember"]{--bg:#0f0600;--bg2:#160900;--card:#1a0c00;--card-hover:#241200;--a1:#ff6a00;--a2:#ffb347;--a3:#ff3300;--text:#ffe0b2;--dim:#7a4010;--border:#3a1800;--glow:rgba(255,106,0,0.15);--glow-red:rgba(255,51,0,0.2);--scan:rgba(0,0,0,0.04);}
+[data-theme="ice"]{--bg:#00080f;--bg2:#000f1a;--card:#001525;--card-hover:#001e33;--a1:#00cfff;--a2:#80e8ff;--a3:#ffffff;--text:#cceeff;--dim:#336688;--border:#003355;--glow:rgba(0,207,255,0.15);--glow-red:rgba(128,232,255,0.2);--scan:rgba(0,0,0,0.03);}
+[data-theme="coffee"]{--bg:#1a100a;--bg2:#221508;--card:#2a1c10;--card-hover:#362414;--a1:#c8813a;--a2:#f0c070;--a3:#e8a050;--text:#f5e6d0;--dim:#8a6040;--border:#4a2e18;--glow:rgba(240,192,112,0.15);--glow-red:rgba(200,129,58,0.2);--scan:rgba(0,0,0,0.04);}
+[data-theme="chocolate"]{--bg:#0f0805;--bg2:#180d07;--card:#1f1009;--card-hover:#2a160c;--a1:#8b4513;--a2:#d2691e;--a3:#ff8c42;--text:#e8d5c4;--dim:#6b3a20;--border:#3d1a0a;--glow:rgba(210,105,30,0.15);--glow-red:rgba(139,69,19,0.2);--scan:rgba(0,0,0,0.05);}
+[data-theme="rainbow"]{--bg:#0a0a0a;--bg2:#111;--card:#161616;--card-hover:#1e1e1e;--a1:#ff4466;--a2:#44ffcc;--a3:#ffdd44;--text:#fff;--dim:#666;--border:#2a2a2a;--glow:rgba(68,255,204,0.15);--glow-red:rgba(255,68,102,0.2);--scan:rgba(0,0,0,0.03);}
+[data-theme="modern"]{--bg:#f0f2f5;--bg2:#ffffff;--card:#ffffff;--card-hover:#f8f9ff;--a1:#6c63ff;--a2:#4f46e5;--a3:#ec4899;--text:#1a1a2e;--dim:#8892a4;--border:#e2e8f0;--glow:rgba(79,70,229,0.18);--glow-red:rgba(236,72,153,0.15);--scan:rgba(0,0,0,0);}
+/* Modern theme overrides — rounded, light, clean */
+[data-theme="modern"] body{font-family:'Inter',system-ui,sans-serif;}
+[data-theme="modern"] body::after{display:none;}
+[data-theme="modern"] .tb{clip-path:none;border-radius:20px;font-family:'Inter',system-ui,sans-serif;}
+[data-theme="modern"] #toolbar{background:rgba(255,255,255,0.85);border-bottom-color:#e2e8f0;box-shadow:0 1px 12px rgba(0,0,0,0.08);}
+[data-theme="modern"] .gcard{clip-path:none;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,0.07);}
+[data-theme="modern"] .gcard:hover{box-shadow:0 8px 32px rgba(79,70,229,0.18);transform:translateY(-3px);}
+[data-theme="modern"] #search{clip-path:none;border-radius:12px;background:#fff;border-color:#e2e8f0;font-family:'Inter',system-ui,sans-serif;}
+[data-theme="modern"] .fbtn{border-radius:20px;}
+[data-theme="modern"] .controls{background:rgba(240,242,245,0.95);}
+[data-theme="modern"] .s-box{border-radius:20px;}
+[data-theme="modern"] .s-inp{border-radius:10px;}
+[data-theme="modern"] #theme-panel{border-radius:14px;}
+[data-theme="modern"] .link-card{clip-path:none;border-radius:14px;}
+[data-theme="modern"] .t-mars{color:var(--a1);text-shadow:none;}
+[data-theme="modern"] .t-rest{color:var(--a2);text-shadow:none;}
+[data-theme="modern"] .card-name{color:#1a1a2e;}
+[data-theme="modern"] .gcard:hover .card-name{color:var(--a2);}
+[data-theme="modern"] .site-title .t-icon{background:radial-gradient(circle,var(--a1) 30%,var(--a2) 100%);}
+[data-theme="modern"] header{background:linear-gradient(180deg,rgba(79,70,229,0.05) 0%,transparent 100%);}
+[data-theme="modern"] .hdr-sub{color:var(--dim);}
+[data-theme="modern"] footer{background:#fff;border-top-color:#e2e8f0;}
+
+/* ═══ PASSWORD SCREEN ═══ */
+#pw-screen{position:fixed;inset:0;z-index:999999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0;}
+#pw-screen.hidden{opacity:0;pointer-events:none;transition:opacity 0.5s;}
+.pw-box{background:var(--card);border:1px solid var(--border);padding:44px 48px;display:flex;flex-direction:column;align-items:center;gap:18px;max-width:380px;width:90%;clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px));box-shadow:0 20px 60px rgba(0,0,0,0.6);}
+[data-theme="modern"] .pw-box{clip-path:none;border-radius:24px;}
+.pw-logo{font-size:38px;}
+.pw-title{font-family:'Orbitron',sans-serif;font-size:20px;font-weight:900;letter-spacing:4px;text-transform:uppercase;color:var(--a2);text-shadow:0 0 20px var(--glow);text-align:center;}
+.pw-sub{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--dim);text-align:center;text-transform:uppercase;}
+#pw-input{width:100%;background:var(--bg2);border:2px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:18px;padding:12px 16px;outline:none;text-align:center;letter-spacing:8px;transition:all 0.2s;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));}
+[data-theme="modern"] #pw-input{clip-path:none;border-radius:12px;}
+#pw-input:focus{border-color:var(--a2);box-shadow:0 0 0 3px var(--glow);}
+#pw-input.pw-wrong{border-color:var(--a1);animation:pwShake 0.4s ease;}
+#pw-enter{background:var(--a2);border:none;color:#000;font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;padding:12px 36px;cursor:pointer;letter-spacing:3px;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));transition:all 0.18s;}
+[data-theme="modern"] #pw-enter{clip-path:none;border-radius:10px;}
+#pw-enter:hover{opacity:0.86;transform:translateY(-1px);}
+#pw-err{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--a1);letter-spacing:2px;min-height:16px;text-align:center;}
+@keyframes pwShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+
+/* ═══ TICKER ═══ */
+#ticker{position:fixed;bottom:0;left:0;right:0;z-index:9960;height:28px;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);border-top:1px solid var(--border);overflow:hidden;display:flex;align-items:center;}
+#ticker-inner{display:flex;align-items:center;white-space:nowrap;animation:tickerScroll 28s linear infinite;}
+.tick-msg{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--a2);padding:0 60px;}
+.tick-sep{color:var(--dim);font-size:10px;}
+@keyframes tickerScroll{0%{transform:translateX(100vw)}100%{transform:translateX(-100%)}}
+/* fade edges */
+#ticker::before,#ticker::after{content:'';position:absolute;top:0;bottom:0;width:80px;z-index:1;pointer-events:none;}
+#ticker::before{left:0;background:linear-gradient(90deg,rgba(0,0,0,0.7),transparent);}
+#ticker::after{right:0;background:linear-gradient(270deg,rgba(0,0,0,0.7),transparent);}
+[data-theme="modern"] #ticker{background:rgba(240,242,245,0.9);border-top-color:#e2e8f0;}
+[data-theme="modern"] #ticker::before{background:linear-gradient(90deg,rgba(240,242,245,0.9),transparent);}
+[data-theme="modern"] #ticker::after{background:linear-gradient(270deg,rgba(240,242,245,0.9),transparent);}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 20% -10%,var(--glow) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 110%,var(--glow-red) 0%,transparent 60%);pointer-events:none;z-index:0;}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,var(--scan) 2px,var(--scan) 4px);pointer-events:none;z-index:999;}
+
+/* ═══ LOADER ═══ */
+#loader{position:fixed;inset:0;background:var(--bg);z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px;transition:opacity 0.5s;}
+#loader.hidden{opacity:0;pointer-events:none;}
+.ld-title{font-family:'Orbitron',sans-serif;font-size:28px;font-weight:900;letter-spacing:6px;color:var(--a2);text-shadow:0 0 20px var(--glow);animation:pulse 1.5s ease-in-out infinite;}
+.ld-bar-wrap{width:280px;height:3px;background:var(--border);overflow:hidden;}
+.ld-bar{height:100%;background:linear-gradient(90deg,var(--a1),var(--a2));animation:ldbar 1.2s ease-in-out infinite;}
+.ld-txt{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--dim);text-transform:uppercase;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
+@keyframes ldbar{0%{width:0%;margin-left:0}50%{width:60%;margin-left:20%}100%{width:0%;margin-left:100%}}
+
+/* ═══ TOOLBAR ═══ */
+#toolbar{position:fixed;top:0;left:0;right:0;z-index:9990;display:flex;gap:6px;padding:8px 12px;flex-wrap:wrap;background:rgba(0,0,0,0.5);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);}
+.tb{background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--dim);font-family:'Share Tech Mono',monospace;font-size:10px;padding:5px 11px;cursor:pointer;letter-spacing:1.5px;text-transform:uppercase;transition:all 0.18s;clip-path:polygon(0 0,calc(100% - 5px) 0,100% 5px,100% 100%,5px 100%,0 calc(100% - 5px));}
+.tb:hover,.tb.act{border-color:var(--a2);color:var(--a2);background:rgba(0,212,255,0.08);}
+.tb.red{border-color:rgba(230,57,70,0.4);color:var(--a1);}
+.tb.red:hover{border-color:var(--a1);background:rgba(230,57,70,0.12);}
+
+/* ═══ THEME PANEL ═══ */
+#theme-panel{position:fixed;top:46px;right:12px;z-index:9980;background:var(--card);border:1px solid var(--border);padding:14px;display:none;flex-direction:column;gap:8px;min-width:170px;box-shadow:0 8px 32px rgba(0,0,0,0.6);border-radius:4px;}
+#theme-panel.open{display:flex;}
+#theme-panel h4{font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:3px;color:var(--a2);margin-bottom:4px;}
+.th-opt{display:flex;align-items:center;gap:8px;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--dim);padding:5px 8px;border:1px solid transparent;transition:all 0.15s;border-radius:2px;}
+.th-opt:hover,.th-opt.active{border-color:var(--border);color:var(--text);background:rgba(255,255,255,0.03);}
+.th-opt.active{border-color:var(--a2);color:var(--a2);}
+.th-sw{width:14px;height:14px;border-radius:50%;border:1px solid rgba(255,255,255,0.2);flex-shrink:0;}
+
+/* ═══ HEADER ═══ */
+header{position:relative;z-index:10;padding:68px 40px 20px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(0,212,255,0.03) 0%,transparent 100%);}
+.hdr{max-width:1500px;margin:0 auto;}
+.site-title{font-family:'Orbitron',sans-serif;font-size:clamp(22px,4vw,40px);font-weight:900;letter-spacing:4px;text-transform:uppercase;line-height:1;display:flex;align-items:center;gap:14px;}
+.t-icon{width:36px;height:36px;background:radial-gradient(circle,var(--a1) 30%,#4a0000 100%);border-radius:50%;box-shadow:0 0 20px var(--glow-red),inset 0 -4px 8px rgba(0,0,0,0.4);flex-shrink:0;position:relative;overflow:hidden;}
+.t-icon::after{content:'';position:absolute;top:20%;left:15%;width:25%;height:15%;background:rgba(255,255,255,0.3);border-radius:50%;transform:rotate(-30deg);}
+.t-mars{color:var(--a1);text-shadow:0 0 20px var(--glow-red),0 0 40px var(--glow-red);}
+.t-rest{color:var(--a2);text-shadow:0 0 20px var(--glow);}
+.hdr-sub{font-family:'Share Tech Mono',monospace;color:var(--dim);font-size:11px;letter-spacing:3px;margin-top:8px;text-transform:uppercase;}
+
+/* ═══ CONTROLS ═══ */
+.controls{position:sticky;top:44px;z-index:100;background:rgba(8,11,20,0.93);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:14px 40px;}
+.ctrl-inner{max-width:1500px;margin:0 auto;display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+#search{flex:1;min-width:180px;background:var(--card);border:1px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:13px;padding:9px 14px;outline:none;transition:border-color 0.2s,box-shadow 0.2s;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));}
+#search::placeholder{color:var(--dim);}
+#search:focus{border-color:var(--a2);box-shadow:0 0 0 1px var(--a2),0 0 12px var(--glow);}
+.fbtns{display:flex;gap:6px;flex-wrap:wrap;}
+.fbtn{background:transparent;border:1px solid var(--border);color:var(--dim);font-family:'Share Tech Mono',monospace;font-size:10px;padding:6px 12px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:all 0.18s;}
+.fbtn:hover,.fbtn.active{border-color:var(--a2);color:var(--a2);background:rgba(0,212,255,0.07);}
+.gcount{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--dim);margin-left:auto;white-space:nowrap;}
+.gcount span{color:var(--a2);font-weight:bold;}
+
+/* ═══ MAIN ═══ */
+main{position:relative;z-index:1;max-width:1500px;margin:0 auto;padding:24px 40px 110px;}
+.sec-label{font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--a1);margin:28px 0 14px;display:flex;align-items:center;gap:12px;}
+.sec-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--a1),transparent);opacity:0.3;}
+
+/* ═══ GRID ═══ */
+.game-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(188px,1fr));gap:10px;}
+.gcard{position:relative;background:var(--card);border:1px solid var(--border);cursor:pointer;transition:all 0.22s ease;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));overflow:hidden;display:block;text-decoration:none;color:inherit;animation:cardIn 0.3s ease both;}
+.gcard::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,212,255,0.04) 0%,transparent 60%);opacity:0;transition:opacity 0.22s;}
+.gcard:hover{border-color:var(--a2);background:var(--card-hover);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.4),0 0 0 1px rgba(0,212,255,0.2),0 0 20px var(--glow);}
+.gcard:hover::before{opacity:1;}
+.card-body{padding:13px 13px 11px;}
+.card-name{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.5px;color:var(--text);line-height:1.3;transition:color 0.2s;word-break:break-word;}
+.gcard:hover .card-name{color:var(--a2);}
+.card-tag{display:inline-block;margin-top:5px;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--dim);background:rgba(255,255,255,0.03);padding:2px 5px;border:1px solid rgba(255,255,255,0.06);}
+.card-tip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#1a2535;border:1px solid var(--a2);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:10px;padding:7px 11px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity 0.12s;z-index:200;box-shadow:0 4px 16px rgba(0,0,0,0.5),0 0 8px var(--glow);}
+.card-tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:4px solid transparent;border-top-color:var(--a2);}
+.gcard:hover .card-tip{opacity:1;}
+.tip-name{color:var(--a2);font-weight:bold;display:block;margin-bottom:2px;}
+.no-res{display:none;text-align:center;padding:60px 20px;color:var(--dim);font-family:'Share Tech Mono',monospace;font-size:13px;letter-spacing:2px;}
+.no-res.show{display:block;}
+@keyframes cardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ═══ SETTINGS PANEL ═══ */
+#settings-panel{position:fixed;inset:0;z-index:98500;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;}
+#settings-panel.open{display:flex;}
+.s-box{background:var(--card);border:1px solid var(--border);min-width:340px;max-width:480px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.8);border-radius:4px;}
+.s-hdr{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--border);background:var(--bg2);}
+.s-hdr span{font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:3px;color:var(--a2);flex:1;}
+.s-body{padding:20px;display:flex;flex-direction:column;gap:16px;}
+.s-section{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--a1);text-transform:uppercase;margin-bottom:2px;}
+.s-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--dim);display:block;margin-bottom:5px;}
+.s-inp{width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:12px;padding:8px 12px;outline:none;border-radius:2px;transition:border-color 0.2s;}
+.s-inp:focus{border-color:var(--a2);}
+.s-presets{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px;}
+.s-pre{background:transparent;border:1px solid var(--border);color:var(--dim);font-family:'Share Tech Mono',monospace;font-size:9px;padding:4px 10px;cursor:pointer;letter-spacing:1px;transition:all 0.15s;}
+.s-pre:hover{border-color:var(--a2);color:var(--a2);}
+.s-row{display:flex;gap:8px;}
+.s-acts{display:flex;gap:8px;}
+.s-btn{flex:1;padding:9px;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;border:1px solid;transition:all 0.18s;}
+.s-btn.save{background:var(--a2);color:#000;border-color:var(--a2);font-weight:700;}
+.s-btn.cls{background:transparent;border-color:var(--border);color:var(--dim);}
+.s-btn.cls:hover{border-color:var(--a1);color:var(--a1);}
+
+/* ═══ HTML RUNNER ═══ */
+#html-runner{position:fixed;inset:0;z-index:98000;background:var(--bg);display:none;flex-direction:column;}
+#html-runner.open{display:flex;}
+.rbar{display:flex;align-items:center;gap:10px;padding:8px 16px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;}
+.rbar h3{font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:2px;color:var(--a2);flex:1;}
+.rb{background:transparent;border:1px solid var(--border);color:var(--dim);font-family:'Share Tech Mono',monospace;font-size:10px;padding:5px 12px;cursor:pointer;letter-spacing:1px;transition:all 0.15s;}
+.rb:hover{border-color:var(--a2);color:var(--a2);}
+.rb.run-btn{background:var(--a2);color:#000;border-color:var(--a2);font-weight:700;}
+.rb.cls-btn{border-color:var(--a1);color:var(--a1);}
+.rsplit{display:flex;flex:1;overflow:hidden;}
+#html-editor{flex:1;resize:none;background:var(--card);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:12px;border:none;border-right:1px solid var(--border);padding:14px;outline:none;tab-size:2;}
+#html-preview{flex:1;border:none;background:#fff;}
+
+/* ═══ PROXY PANEL ═══ */
+#proxy-panel{position:fixed;inset:0;z-index:97000;background:rgba(0,0,0,0.95);display:none;flex-direction:column;}
+#proxy-panel.open{display:flex;}
+.pbar{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;}
+.pbar h3{font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;color:var(--a2);}
+.ptabs{display:flex;gap:6px;margin-left:auto;}
+.ptab{background:transparent;border:1px solid var(--border);color:var(--dim);font-family:'Share Tech Mono',monospace;font-size:9px;padding:5px 12px;cursor:pointer;letter-spacing:1px;transition:all 0.15s;}
+.ptab.active{border-color:var(--a2);color:var(--a2);background:rgba(0,212,255,0.08);}
+.pcnt{flex:1;display:none;flex-direction:column;padding:16px;gap:12px;overflow-y:auto;}
+.pcnt.active{display:flex;}
+.purlbar{display:flex;gap:8px;}
+.purlinp{flex:1;background:var(--card);border:1px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:12px;padding:9px 14px;outline:none;}
+.pgo{background:var(--a2);border:none;color:#000;font-family:'Orbitron',monospace;font-size:10px;padding:9px 20px;cursor:pointer;font-weight:700;letter-spacing:2px;}
+.pinfo{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--dim);line-height:1.8;}
+.pinfo a{color:var(--a2);text-decoration:none;}
+.pframe{flex:1;border:none;background:#fff;min-height:300px;}
+
+/* ═══ MUSIC PLAYER ═══ */
+#music-player{position:fixed;bottom:0;left:0;right:0;z-index:9970;background:rgba(8,11,20,0.97);backdrop-filter:blur(20px);border-top:1px solid var(--border);transform:translateY(100%);transition:transform 0.35s cubic-bezier(.4,0,.2,1);}
+#music-player.mini{transform:translateY(calc(100% - 48px));}
+#music-player.open{transform:translateY(0);}
+.mbar{display:flex;align-items:center;gap:12px;padding:7px 20px;cursor:pointer;min-height:48px;border-bottom:1px solid var(--border);}
+.mbar-info{flex:1;min-width:0;}
+.np-lbl{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--dim);}
+.np-ttl{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--a2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mctrls{display:flex;align-items:center;gap:10px;padding:10px 20px 12px;flex-wrap:wrap;}
+.mb{background:transparent;border:1px solid var(--border);color:var(--dim);font-size:14px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.15s;font-family:monospace;}
+.mb:hover,.mb.act{border-color:var(--a2);color:var(--a2);}
+.mb.pb{border-color:var(--a1);color:var(--a1);width:38px;height:38px;font-size:15px;}
+.mb.pb:hover{background:rgba(230,57,70,0.15);}
+.mprg{flex:1;display:flex;align-items:center;gap:7px;min-width:100px;}
+.pbar2{flex:1;height:3px;background:var(--border);cursor:pointer;}
+.pfill{height:100%;background:linear-gradient(90deg,var(--a1),var(--a2));width:0%;transition:width 0.5s;}
+.td{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--dim);}
+.vw{display:flex;align-items:center;gap:6px;}
+#vol-slider{width:64px;accent-color:var(--a2);cursor:pointer;}
+.tlist{max-height:140px;overflow-y:auto;border-top:1px solid var(--border);}
+.titem{display:flex;align-items:center;gap:8px;padding:7px 20px;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--dim);cursor:pointer;transition:all 0.15s;border-bottom:1px solid rgba(255,255,255,0.02);}
+.titem:hover{background:rgba(255,255,255,0.03);color:var(--text);}
+.titem.playing{color:var(--a2);background:rgba(0,212,255,0.05);}
+.vbars{display:flex;gap:2px;align-items:flex-end;height:18px;width:20px;}
+.vb{width:3px;background:var(--a2);border-radius:1px;height:4px;}
+.titem.playing .vb{animation:vba 0.6s ease-in-out infinite;}
+.titem.playing .vb:nth-child(2){animation-delay:0.1s;}
+.titem.playing .vb:nth-child(3){animation-delay:0.2s;}
+@keyframes vba{0%,100%{height:4px}50%{height:16px}}
+
+/* ═══ TOAST ═══ */
+#toast{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--a2);color:var(--a2);font-family:'Share Tech Mono',monospace;font-size:11px;padding:8px 20px;letter-spacing:2px;z-index:99999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;}
+#toast.show{opacity:1;}
+
+/* rainbow animated */
+[data-theme="rainbow"] .t-mars,[data-theme="rainbow"] .t-rest{background:linear-gradient(90deg,#ff4466,#ffaa44,#ffdd44,#44ff88,#44ffcc,#4488ff,#aa44ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:rbS 3s linear infinite;background-size:200%;}
+@keyframes rbS{0%{background-position:0%}100%{background-position:200%}}
+
+/* ═══ LINKS ═══ */
+.links-grid{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px;}
+.link-card{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border);padding:12px 16px;text-decoration:none;color:var(--text);transition:all 0.2s;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));min-width:260px;flex:1 1 260px;max-width:480px;}
+.link-card:hover{border-color:var(--a2);background:var(--card-hover);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.4),0 0 16px var(--glow);}
+.link-icon{font-size:22px;flex-shrink:0;}
+.link-info{flex:1;min-width:0;}
+.link-name{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--text);transition:color 0.2s;}
+.link-card:hover .link-name{color:var(--a2);}
+.link-url{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--dim);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.link-arrow{font-size:16px;color:var(--dim);transition:all 0.2s;flex-shrink:0;}
+.link-card:hover .link-arrow{color:var(--a2);transform:translateX(3px);}
+
+footer{position:relative;z-index:1;border-top:1px solid var(--border);text-align:center;padding:22px 20px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--dim);}
+footer span{color:var(--a1);}
+footer a{color:var(--a2);text-decoration:none;}
+
+@media(max-width:600px){
+  header,.controls{padding-left:14px;padding-right:14px;}
+  main{padding:18px 14px 60px;}
+  .game-grid{grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;}
+}
+</style>
+</head>
+<body data-theme="mars">
+
+<!-- PASSWORD SCREEN -->
+<div id="pw-screen">
+  <div class="pw-box">
+    <div class="pw-logo">🔴</div>
+    <div class="pw-title">Mars Game Stash</div>
+    <div class="pw-sub">// Enter access code to continue</div>
+    <input type="password" id="pw-input" placeholder="••••" maxlength="20" autocomplete="off"
+      onkeydown="if(event.key==='Enter')checkPW()">
+    <button id="pw-enter" onclick="checkPW()">ENTER ▶</button>
+    <div id="pw-err"></div>
+  </div>
+</div>
+
+<!-- TICKER -->
+<div id="ticker">
+  <div id="ticker-inner">
+    <span class="tick-msg">You are currently using MGS:stable version</span>
+    <span class="tick-sep">◆</span>
+    <span class="tick-msg">Welcome to Mars Game Stash — play anything, anywhere</span>
+    <span class="tick-sep">◆</span>
+    <span class="tick-msg">You are currently using MGS:stable version</span>
+    <span class="tick-sep">◆</span>
+    <span class="tick-msg">Use arrow keys or search to find your game</span>
+    <span class="tick-sep">◆</span>
+    <span class="tick-msg">You are currently using MGS:stable version</span>
+    <span class="tick-sep">◆</span>
+  </div>
+</div>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="ld-title">MARS GAME STASH</div>
+  <div class="ld-bar-wrap"><div class="ld-bar"></div></div>
+  <div class="ld-txt">Loading game library...</div>
+</div>
+
+<!-- TOOLBAR -->
+<div id="toolbar">
+  <button class="tb red" onclick="cloakBlank()">⬛ Blank Cloak</button>
+  <button class="tb red" onclick="cloakBlob()">🔵 Blob Cloak</button>
+  <button class="tb" onclick="toggleThemePanel()">🎨 Theme</button>
+  <button class="tb" onclick="openHTMLRunner()">💻 HTML Runner</button>
+  <button class="tb" onclick="openProxy()">🌐 Proxy</button>
+  <button class="tb" onclick="toggleMusic()">🎵 Music</button>
+  <button class="tb" onclick="openSettings()">⚙️ Settings</button>
+</div>
+
+<!-- THEME PANEL -->
+<div id="theme-panel">
+  <h4>// SELECT THEME</h4>
+  <div class="th-opt active" data-theme="mars" onclick="setTheme('mars',this)"><div class="th-sw" style="background:radial-gradient(circle,#e63946,#00d4ff)"></div>Mars</div>
+  <div class="th-opt" data-theme="neon" onclick="setTheme('neon',this)"><div class="th-sw" style="background:radial-gradient(circle,#ff00ff,#00ffaa)"></div>Neon Grid</div>
+  <div class="th-opt" data-theme="hacker" onclick="setTheme('hacker',this)"><div class="th-sw" style="background:radial-gradient(circle,#00ff41,#003300)"></div>Hacker</div>
+  <div class="th-opt" data-theme="abyss" onclick="setTheme('abyss',this)"><div class="th-sw" style="background:radial-gradient(circle,#7b2fff,#ff2fff)"></div>Abyss</div>
+  <div class="th-opt" data-theme="ember" onclick="setTheme('ember',this)"><div class="th-sw" style="background:radial-gradient(circle,#ff6a00,#ffb347)"></div>Ember</div>
+  <div class="th-opt" data-theme="ice" onclick="setTheme('ice',this)"><div class="th-sw" style="background:radial-gradient(circle,#00cfff,#cceeff)"></div>Ice</div>
+  <div class="th-opt" data-theme="coffee" onclick="setTheme('coffee',this)"><div class="th-sw" style="background:radial-gradient(circle,#c8813a,#f0c070)"></div>Coffee</div>
+  <div class="th-opt" data-theme="chocolate" onclick="setTheme('chocolate',this)"><div class="th-sw" style="background:radial-gradient(circle,#8b4513,#d2691e)"></div>Chocolate</div>
+  <div class="th-opt" data-theme="rainbow" onclick="setTheme('rainbow',this)"><div class="th-sw" style="background:linear-gradient(135deg,#ff4466,#ffdd44,#44ffcc,#4488ff)"></div>Rainbow</div>
+  <div class="th-opt" data-theme="modern" onclick="setTheme('modern',this)"><div class="th-sw" style="background:linear-gradient(135deg,#6c63ff,#4f46e5,#ec4899)"></div>Modern</div>
+</div>
+
+<header>
+  <div class="hdr">
+    <div class="site-title">
+      <div class="t-icon"></div>
+      <span class="t-mars">Mars</span>
+      <span class="t-rest">Game Stash</span>
+    </div>
+    <div class="hdr-sub">// private unblocked library — play anything, anywhere</div>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="ctrl-inner">
+    <input type="text" id="search" placeholder="Search games..." oninput="filterGames()" autocomplete="off">
+    <div class="fbtns">
+      <button class="fbtn active" onclick="setFilter('all',this)">All</button>
+      <button class="fbtn" onclick="setFilter('html5',this)">HTML5</button>
+      <button class="fbtn" onclick="setFilter('flash',this)">Flash</button>
+      <button class="fbtn" onclick="setFilter('emulated',this)">Emulated</button>
+      <button class="fbtn" onclick="setFilter('fnf',this)">FNF</button>
+      <button class="fbtn" onclick="setFilter('cdn',this)">CDN</button>
+    </div>
+    <div class="gcount">GAMES: <span id="gcount">0</span></div>
+  </div>
+</div>
+
+<main>
+  <div id="no-res" class="no-res">NO GAMES FOUND</div>
+
+  <!-- LINKS SECTION -->
+  <div class="sec-label" style="margin-top:10px;">// Links</div>
+  <div class="links-grid">
+    <a class="link-card" href="https://www.canva.com/design/DAHGGYU0kt4/Ho6pfu_yTxkusH7bUBEesA/view" target="_blank">
+      <div class="link-icon">🎨</div>
+      <div class="link-info">
+        <div class="link-name">Mars Canva Design</div>
+        <div class="link-url">canva.com/design/DAHGGYU0kt4</div>
+      </div>
+      <div class="link-arrow">→</div>
+    </a>
+  </div>
+
+  <div class="sec-label">// Games</div>
+  <div id="game-grid" class="game-grid"></div>
+</main>
+
+<footer>
+  Private unblocked game stash by <span>Mars</span> &nbsp;|&nbsp;
+  Discord: <a href="#">marmaryt2590butnew</a>
+</footer>
+
+<!-- SETTINGS PANEL -->
+<div id="settings-panel">
+  <div class="s-box">
+    <div class="s-hdr">
+      <span>⚙️ SETTINGS</span>
+      <button class="s-btn cls" style="flex:0;padding:5px 12px;" onclick="closeSettings()">✕</button>
+    </div>
+    <div class="s-body">
+      <div>
+        <div class="s-section">// Tab Disguise</div>
+        <label class="s-label">Tab Title</label>
+        <input id="s-tab-title" class="s-inp" type="text" placeholder="Google Classroom" value="Mars Game Stash">
+        <div class="s-presets">
+          <button class="s-pre" onclick="document.getElementById('s-tab-title').value='Google Classroom'">Classroom</button>
+          <button class="s-pre" onclick="document.getElementById('s-tab-title').value='Khan Academy'">Khan Academy</button>
+          <button class="s-pre" onclick="document.getElementById('s-tab-title').value='Google Docs'">Google Docs</button>
+          <button class="s-pre" onclick="document.getElementById('s-tab-title').value='Quizlet'">Quizlet</button>
+          <button class="s-pre" onclick="document.getElementById('s-tab-title').value='Google Slides'">Slides</button>
+        </div>
+        <label class="s-label" style="margin-top:10px;">Tab Favicon URL</label>
+        <input id="s-favicon" class="s-inp" type="text" placeholder="https://example.com/favicon.ico">
+        <div class="s-presets" style="margin-top:6px;">
+          <button class="s-pre" onclick="setFaviconPreset('https://www.google.com/favicon.ico','https://www.google.com/favicon.ico')">Google</button>
+          <button class="s-pre" onclick="setFaviconPreset('https://ssl.gstatic.com/classroom/favicon.png','https://ssl.gstatic.com/classroom/favicon.png')">Classroom</button>
+          <button class="s-pre" onclick="setFaviconPreset('https://www.gstatic.com/images/branding/product/1x/docs_2020q4_32dp.png','https://www.gstatic.com/images/branding/product/1x/docs_2020q4_32dp.png')">Docs</button>
+          <button class="s-pre" onclick="setFaviconPreset('https://www.khanacademy.org/favicon.ico','https://www.khanacademy.org/favicon.ico')">Khan</button>
+          <button class="s-pre" onclick="setFaviconPreset('https://quizlet.com/favicon.ico','https://quizlet.com/favicon.ico')">Quizlet</button>
+          <button class="s-pre" onclick="setFaviconPreset('https://www.youtube.com/favicon.ico','https://www.youtube.com/favicon.ico')">YouTube</button>
+        </div>
+      </div>
+      <div>
+        <div class="s-section">// Panic Key</div>
+        <div class="s-row">
+          <select id="s-panic-key" class="s-inp" style="flex:0 0 80px;">
+            <option>Escape</option><option>F1</option><option>F2</option><option>F5</option>
+          </select>
+          <select id="s-panic-dest" class="s-inp" style="flex:1;">
+            <option value="https://classroom.google.com">Google Classroom</option>
+            <option value="https://docs.google.com">Google Docs</option>
+            <option value="https://kahoot.it">Kahoot</option>
+            <option value="https://quizlet.com">Quizlet</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <div class="s-section">// Cloak</div>
+        <div class="s-row">
+          <button class="s-btn" style="border-color:var(--a1);color:var(--a1);" onclick="cloakBlank()">⬛ Blank Cloak</button>
+          <button class="s-btn" style="border-color:var(--a2);color:var(--a2);" onclick="cloakBlob()">🔵 Blob Cloak</button>
+        </div>
+      </div>
+      <div class="s-acts">
+        <button class="s-btn save" onclick="applySettings()">✓ Save Settings</button>
+        <button class="s-btn cls" onclick="closeSettings()">✕ Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HTML RUNNER -->
+<div id="html-runner">
+  <div class="rbar">
+    <h3>// HTML RUNNER / COMPILER</h3>
+    <button class="rb run-btn" onclick="runHTML()">▶ Run</button>
+    <button class="rb" onclick="clearEditor()">✕ Clear</button>
+    <button class="rb" onclick="fsPreview()">⛶ Fullscreen</button>
+    <button class="rb cls-btn" onclick="closeHTMLRunner()">✕ Close</button>
+  </div>
+  <div class="rsplit">
+    <textarea id="html-editor" placeholder="<!-- Write or paste HTML here, click Run -->" spellcheck="false"></textarea>
+    <iframe id="html-preview"></iframe>
+  </div>
+</div>
+
+<!-- PROXY PANEL -->
+<div id="proxy-panel">
+  <div class="pbar">
+    <h3>// WEB PROXY</h3>
+    <div class="ptabs">
+      <button class="ptab active" onclick="showPTab('helios',this)">Helios</button>
+      <button class="ptab" onclick="showPTab('sandstone',this)">Sandstone</button>
+      <button class="ptab" onclick="showPTab('ultraviolet',this)">Ultraviolet</button>
+      <button class="ptab" onclick="showPTab('rammerhead',this)">Rammerhead</button>
+    </div>
+    <button class="rb cls-btn" style="margin-left:10px;" onclick="closeProxy()">✕ Close</button>
+  </div>
+  <div class="pcnt active" id="proxy-helios">
+    <div class="pinfo">Helios — <a href="https://heliosgg.netlify.app" target="_blank">heliosgg.netlify.app</a></div>
+    <div class="purlbar"><input class="purlinp" id="pu1" value="https://heliosgg.netlify.app"><button class="pgo" onclick="loadP('pf1','pu1')">GO</button></div>
+    <iframe id="pf1" class="pframe" src="https://heliosgg.netlify.app"></iframe>
+  </div>
+  <div class="pcnt" id="proxy-sandstone">
+    <div class="pinfo">Sandstone — <a href="https://sandstone.pages.dev" target="_blank">sandstone.pages.dev</a></div>
+    <div class="purlbar"><input class="purlinp" id="pu2" value="https://sandstone.pages.dev"><button class="pgo" onclick="loadP('pf2','pu2')">GO</button></div>
+    <iframe id="pf2" class="pframe" src="https://sandstone.pages.dev"></iframe>
+  </div>
+  <div class="pcnt" id="proxy-ultraviolet">
+    <div class="pinfo">Ultraviolet — <a href="https://uv.wtf" target="_blank">uv.wtf</a></div>
+    <div class="purlbar"><input class="purlinp" id="pu3" value="https://uv.wtf"><button class="pgo" onclick="loadP('pf3','pu3')">GO</button></div>
+    <iframe id="pf3" class="pframe" src="https://uv.wtf"></iframe>
+  </div>
+  <div class="pcnt" id="proxy-rammerhead">
+    <div class="pinfo">Rammerhead — <a href="https://rammerhead.org" target="_blank">rammerhead.org</a></div>
+    <div class="purlbar"><input class="purlinp" id="pu4" value="https://rammerhead.org"><button class="pgo" onclick="loadP('pf4','pu4')">GO</button></div>
+    <iframe id="pf4" class="pframe" src="https://rammerhead.org"></iframe>
+  </div>
+</div>
+
+<!-- MUSIC PLAYER -->
+<div id="music-player" class="mini">
+  <div class="mbar" onclick="toggleMusicExpand()">
+    <div class="vbars" id="hdr-vbars"><div class="vb"></div><div class="vb"></div><div class="vb"></div></div>
+    <div class="mbar-info">
+      <div class="np-lbl">Now Playing</div>
+      <div class="np-ttl" id="np-title">Select a track...</div>
+    </div>
+    <span style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--dim);">▾ EXPAND</span>
+  </div>
+  <div class="mctrls">
+    <button class="mb" onclick="prevTrack()">⏮</button>
+    <button class="mb pb" id="play-btn" onclick="togglePlay()">▶</button>
+    <button class="mb" onclick="nextTrack()">⏭</button>
+    <button class="mb" id="shuf-btn" onclick="toggleShuffle()">⇌</button>
+    <button class="mb" id="loop-btn" onclick="toggleLoop()">↻</button>
+    <div class="mprg">
+      <span class="td" id="time-cur">0:00</span>
+      <div class="pbar2" onclick="seekTo(event)" id="pbar2"><div class="pfill" id="pfill"></div></div>
+      <span class="td" id="time-dur">0:00</span>
+    </div>
+    <div class="vw">🔊<input type="range" id="vol-slider" min="0" max="1" step="0.01" value="0.7" oninput="setVol(this.value)"></div>
+  </div>
+  <div class="tlist" id="track-list"></div>
+</div>
+<audio id="audio-el" preload="metadata"></audio>
+
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+//  GAME DATA
+// ══════════════════════════════════════════
+const GAMES = [
+  // HTML5
+  {n:"Baldi's Basics",u:"https://drive.google.com/file/d/1UeCBcErh14gonxfw0y2amxbrqZfrttKj/view",t:"html5"},
+  {n:"Baseball Bros",u:"https://drive.google.com/file/d/1C4G1M6f2VNuS61lYqrv9MGEtnFMtP-TP/view",t:"html5"},
+  {n:"Basket Bros",u:"https://drive.google.com/file/d/1R6OCaS56zMHchP9zsHbxeFXx-3SsPuAU/view",t:"html5"},
+  {n:"Basket Random",u:"https://drive.google.com/file/d/1mq1psi8_H4jyQslycPGSR-dbkWJ1QAW9/view",t:"html5"},
+  {n:"Tomb of the Mask",u:"https://drive.google.com/file/d/1uCr1KuIfZ46DJeOX92ZYY2nlyQ6ulPcs/view",t:"html5"},
+  {n:"BitLife",u:"https://drive.google.com/file/d/1qdHWXaWjyk4wvpxf9q6S-lQP9X0DhsTA/view",t:"html5"},
+  {n:"Escape Road",u:"https://drive.google.com/file/d/14vjJbM91SrRGqic6DG9CqQ5r5NPKEzMo/view",t:"html5"},
+  {n:"Drive Mad",u:"https://drive.google.com/file/d/1_U2IKm5-MY5hUROiO46BaOWy81ym_yhr/view",t:"html5"},
+  {n:"Crazy Cattle 3D",u:"https://drive.google.com/file/d/1l9yA5vMAqkcrH8Jua2LEnD-s-wTIFZ0R/view",t:"html5"},
+  {n:"Cookie Clicker",u:"https://drive.google.com/file/d/1kDlM4BCzn7TMezp94VWPL5RhbFXZIwf-/view",t:"html5"},
+  {n:"Burrito Bison Launcha Libre",u:"https://drive.google.com/file/d/1Mvs0de1vB6AtPBHYUpYVaXzUmt2D9QtY/view",t:"html5"},
+  {n:"Rooftop Snipers",u:"https://drive.google.com/file/d/1RSrgfX1zyTi5GsOCkBWDqyG7q3FMzPBW/view",t:"html5"},
+  {n:"Retro Bowl",u:"https://drive.google.com/file/d/1U0oR-obhfztS7tMeA1wTirCYeKD_f7_a/view",t:"html5"},
+  {n:"Snow Rider 3D",u:"https://drive.google.com/file/d/1LEYD8dy6nt7zpBHsO0OPN56efXn7L419/view",t:"html5"},
+  {n:"Run 3",u:"https://drive.google.com/file/d/18vF8LB5DpPYIaZ_UarNOcxyx044gu19o/view",t:"html5"},
+  {n:"Slope",u:"https://drive.google.com/file/d/1csdFwFf5p_De_IadUUVXVGl0h3ivFD63/view",t:"html5"},
+  {n:"Doki Doki Literature Club",u:"https://drive.google.com/file/d/1uj9FGWBCSbYlE687dedSZEO1pF4e6iRC/view",t:"html5"},
+  {n:"Deltarune",u:"https://drive.google.com/file/d/1Z8whTWE02uB9hEga3jaW6AkQhzEaFGKh/view",t:"html5"},
+  {n:"Dreadhead Parkour",u:"https://drive.google.com/file/d/1g_1WN6LNM1q5drv-cUTiUk09Y3ZwnM6p/view",t:"html5"},
+  {n:"1v1.lol",u:"https://drive.google.com/file/d/16SVHF4XRFjv5WCqlLHJZhF6nkBM7q4ex/view",t:"html5"},
+  {n:"2048",u:"https://drive.google.com/file/d/13xSrRMeCad0nyxRTPaaTQIMzVHk5Cd_s/view",t:"html5"},
+  {n:"10 Minutes Till Dawn",u:"https://drive.google.com/file/d/1b2druj6_Zlrdq1h9gS4oaqQwJvND4z08/view",t:"html5"},
+  {n:"Smash Karts",u:"https://drive.google.com/file/d/1Xz6hyYp4-ckBrkDa8mdVqPeC1nwMljyg/view",t:"html5"},
+  {n:"Getaway Shootout",u:"https://drive.google.com/file/d/14B32tBAhluuDTRg0oYHuQykADNN0LUTD/view",t:"html5"},
+  {n:"OVO",u:"https://drive.google.com/file/d/1Uqan3Lv0gldfyBGp6QY6_q0HZmLuU30d/view",t:"html5"},
+  {n:"Slope 3",u:"https://drive.google.com/file/d/18IWxc8OY4eBwMGlJ0a5A2uK_-l8KI6au/view",t:"html5"},
+  {n:"Moto X3M",u:"https://drive.google.com/file/d/1R-J62MHWd7po7gRHGOitewZ3qPs1vGEj/view",t:"html5"},
+  {n:"Tunnel Rush",u:"https://drive.google.com/file/d/1oOts85wAfZNzl0rLOl1azcMB9cWfd6ws/view",t:"html5"},
+  {n:"Vex 5",u:"https://drive.google.com/file/d/1D-705UyHXz6UWCnpgNL123tMIDoy0Q7C/view",t:"html5"},
+  {n:"Vex 6",u:"https://drive.google.com/file/d/1vOmwZHRpz_4nUGf_VKW01mjt6nOiOWf5/view",t:"html5"},
+  {n:"Vex 7",u:"https://drive.google.com/file/d/1r5FMGSERumWQags8qggpWq1pmgl9DKPW/view",t:"html5"},
+  {n:"Vex 8",u:"https://drive.google.com/file/d/1OhGOhkjdmBpe3XYTO7h1zF6gAw5j4KU2/view",t:"html5"},
+  {n:"House of Hazards",u:"https://drive.google.com/file/d/1pwmfcL73hVdjuqO8sFOKCRsuLzT6YPjL/view",t:"html5"},
+  {n:"Drift Boss",u:"https://drive.google.com/file/d/1UNbv-2GnAKy5AHvuRUCRy9E6mBuDmywM/view",t:"html5"},
+  {n:"Dinosaur Game",u:"https://drive.google.com/file/d/17eDFviFV8EVCT5g0eTuYlaD607LXY6iD/view",t:"html5"},
+  {n:"Subway Surfers: Berlin",u:"https://drive.google.com/file/d/13PrK1H6bbhDtG1YeOutOV2OGXTfTVpym/view",t:"html5"},
+  {n:"Subway Surfers: London",u:"https://drive.google.com/file/d/17ys8g9hw7rrVAebugJdPUDnvczx-gHxc/view",t:"html5"},
+  {n:"Subway Surfers: Beijing",u:"https://drive.google.com/file/d/1S3YmRd96-B3KS_6ViViWtB7OyNrQw2-J/view",t:"html5"},
+  {n:"Subway Surfers: Miami",u:"https://drive.google.com/file/d/1Xd9itPeqqwiHb3eelYntyCVMbrOJ4gkE/view",t:"html5"},
+  {n:"Sprunki",u:"https://drive.google.com/file/d/1AT7yMiig_G-e2J4JLMn8SgczIQgBTx0e/view",t:"html5"},
+  {n:"Vampire Survivors",u:"https://drive.google.com/file/d/1fPT14ttfK4l5goO5SEm7fvk2JaGW2u8n/view",t:"html5"},
+  {n:"Tiny Fishing",u:"https://drive.google.com/file/d/1aD6ayE0Mqzry0U-zO1qXqc3p_MCw1kqe/view",t:"html5"},
+  {n:"Suika Game",u:"https://drive.google.com/file/d/1CHE1d9sGxq36ucsGtWpR59ybsNP9afYn/view",t:"html5"},
+  {n:"Poly Track",u:"https://drive.google.com/file/d/1EpnALcD3vQAmUmLzuefCx-E2aau0x4LP/view",t:"html5"},
+  {n:"Geometry Dash Lite",u:"https://drive.google.com/file/d/1jvsz_EmjOTwgCcfeyPtZCfXKJn9SD2bs/view",t:"html5"},
+  {n:"Infinite Craft",u:"https://drive.google.com/file/d/1PsL3fGOAklgsVLV4Ticq3QGoG678QV2X/view",t:"html5"},
+  {n:"Slow Roads",u:"https://drive.google.com/file/d/1i2Fnf6MikLJlZoLSCHckXEmA_P6ZWgrM/view",t:"html5"},
+  {n:"Drift Hunters",u:"https://drive.google.com/file/d/1fUSbaLmNOmcVoGG3oXTopvxh-xMJeUv_/view",t:"html5"},
+  {n:"Pizza Tower",u:"https://drive.google.com/file/d/1Ooqv4dWRWHjA_gsYjeBuPf4Hxgz9c-hl/view",t:"html5"},
+  {n:"Backrooms",u:"https://drive.google.com/file/d/1sDmcbIS6Aw7713_diZ_Sos5hM4Vb_c1X/view",t:"html5"},
+  {n:"Celeste Pico",u:"https://drive.google.com/file/d/1Ws1eKPbFaNchQTrSwNtUwgSlatU9GYSw/view",t:"html5"},
+  {n:"Hollow Knight",u:"https://drive.google.com/file/d/19hU0AIFWdNwT48QVascDz1yA1RQ4WROR/view",t:"html5"},
+  {n:"Melon Playground",u:"https://drive.google.com/file/d/1btZMMwyumRShvM4iKE2SqZEgi70wqe-X/view",t:"html5"},
+  {n:"Stacky Dash",u:"https://drive.google.com/file/d/1IS41Lxh7Yuu4QZh7AcyhUGng_PuhwiEP/view",t:"html5"},
+  {n:"Stickman Hook",u:"https://drive.google.com/file/d/1cpvQpnChRObc_S-QvQiqAGm1gjlBvlf8/view",t:"html5"},
+  {n:"Wordle",u:"https://drive.google.com/file/d/15StKh4AkOPxjWOpWqZyT-6SbyIeP4ZAP/view",t:"html5"},
+  {n:"Osu!",u:"https://drive.google.com/file/d/1Vw5Dp82gCqVMjYn8K2O5dlQSuUzX5J1T/view",t:"html5"},
+  {n:"Ragdoll Archers",u:"https://drive.google.com/file/d/1IWsoFo_1HzgTOII6qVPQVsaYrchAG9vS/view",t:"html5"},
+  {n:"Rolly Vortex",u:"https://drive.google.com/file/d/1DBThpNLGcbCQsNS_2oaUUyx4DKxpZ-UU/view",t:"html5"},
+  {n:"Bounce Back",u:"https://drive.google.com/file/d/1J0twLMLM255S9hEUptVK9-LbWcVY3f5d/view",t:"html5"},
+  {n:"Tanuki Sunset",u:"https://drive.google.com/file/d/1LoZvCKlrl0Ug2WAVacCXZRimOpHBJKNb/view",t:"html5"},
+  {n:"Plinko",u:"https://drive.google.com/file/d/1IBmx5lSU86VfgQYzUCyTJvPxQbs82VuF/view",t:"html5"},
+  {n:"Level Devil",u:"https://drive.google.com/file/d/1XujI67QSMHxadEWjw9lW6sS0iAqkBoti/view",t:"html5"},
+  {n:"Solar Smash",u:"https://drive.google.com/file/d/1kTdjIQLimFHK1M3Xj3qzv93nsoCddlP5/view",t:"html5"},
+  {n:"Granny",u:"https://drive.google.com/file/d/1loG5SS3R4bD-e45VW-wVfTxe4E6NcODd/view",t:"html5"},
+  {n:"Granny 2",u:"https://drive.google.com/file/d/1FFhwgTSE17YocyoeJAjFLgtM39j5GmXt/view",t:"html5"},
+  {n:"Granny 3",u:"https://drive.google.com/file/d/1lYJ3yzldT5rRcQplTUGO64Mmo5Bwban3/view",t:"html5"},
+  {n:"Cluster Rush",u:"https://drive.google.com/file/d/1SZvQmIHn9H8T08W_CNK5ZrvVssTc2WKG/view",t:"html5"},
+  {n:"Time Shooter 2",u:"https://drive.google.com/file/d/1ue5vdSn38hNtn1gfrVYdcIOJT2DjBN_c/view",t:"html5"},
+  {n:"Time Shooter 3",u:"https://drive.google.com/file/d/1jncjCHd-2a0QFkp1tJevtpWkxH_nRlUm/view",t:"html5"},
+  {n:"Scary Teacher 3D",u:"https://drive.google.com/file/d/1oI_zQ1ZejituIRyd8XI7mbSv8L7-TK84/view",t:"html5"},
+  {n:"Pixel Warfare",u:"https://drive.google.com/file/d/1YAsZ6W7cTi42QG_zrnOgGLH_ulOyf19J/view",t:"html5"},
+  {n:"Kour.io",u:"https://drive.google.com/file/d/1fTqYWvb5qSptsFFLZNjJm_313RZsUGr3/view",t:"html5"},
+  {n:"State.io",u:"https://drive.google.com/file/d/1Pcs0tw4hZtvsG-3ay60nqUYFB4tS0QSx/view",t:"html5"},
+  {n:"Paper.io",u:"https://drive.google.com/file/d/1zonzHKMOXWnkKS4q7OBQugKpHB8YIxAr/view",t:"html5"},
+  {n:"Paper.io 3D",u:"https://drive.google.com/file/d/1vaSWsaIRMk6V9Hu1ImDjbSH3yjmlG8U5/view",t:"html5"},
+  {n:"Slither.io",u:"https://drive.google.com/file/d/1ZPK56ffr7zlGEuBfZJH0VrWPBsoEYIC1/view",t:"html5"},
+  {n:"Hole.io",u:"https://drive.google.com/file/d/1cYl47URR5mhH0m3p2TvvwUD3N1FoBU_y/view",t:"html5"},
+  {n:"Territorial.io",u:"https://drive.google.com/file/d/1cV4PMPByp67qnxLasWfMdv5Xll56AqwJ/view",t:"html5"},
+  {n:"Grow A Garden",u:"https://drive.google.com/file/d/1xCKB6yywnjMskWQeyBLMCJedZNOS9qIO/view",t:"html5"},
+  {n:"Adventure Capitalist",u:"https://drive.google.com/file/d/16xb8cR1lk7OlwDOPMVCbcNrMDpOeJN0Z/view",t:"html5"},
+  {n:"Idle Breakout",u:"https://drive.google.com/file/d/1OZ0h5Dx1CysK18k3Nw_ToOgGuwso5g6B/view",t:"html5"},
+  {n:"Doge Miner 2",u:"https://drive.google.com/file/d/1GhQGUH6BM59QAbHNOoTrW7LaPpE183s6/view",t:"html5"},
+  {n:"Capybara Clicker",u:"https://drive.google.com/file/d/19OYyqnexam2yvYIASmnKen9KszHQsBb7/view",t:"html5"},
+  {n:"Sprunki Clicker",u:"https://drive.google.com/file/d/1MRnKq6C_9YIJUP-bRp0ko_BIAR097w1f/view",t:"html5"},
+  {n:"Grow Your Garden",u:"https://drive.google.com/file/d/1LERs4b28Vz6ZJmhJF3CavK5aczv2ANUi/view",t:"html5"},
+  // CDN — fetch HTML directly, no Drive needed
+  {n:"Slow Roads (CDN)",u:"https://cdn.jsdelivr.net/gh/fork-so-the-site-i-take-wont-be-deleted/bulbasaurchat.github.io@main/games/slow-roads-main/slow-roads-main/index.html",t:"cdn"},
+  {n:"Five Nights at Big E",u:"https://cdn.jsdelivr.net/gh/web-ports/fnae@c9c8b513a27155bf37c4ab3dee74e99b12b895ba/index.html",t:"cdn"},
+  {n:"Block Blast Puzzle",u:"https://cdn.jsdelivr.net/gh/genizy/bl/index.html",t:"cdn"},
+  {n:"OneShot",u:"https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/oneshot.html",t:"cdn"},
+  {n:"Snake",u:"__snake__",t:"html5"},
+  {n:"Binding of Isaac: WOTL",u:"https://rawcdn.githack.com/bubbls/ugss/3eb957d7d5b10de8e9cba751f6a792ca2c355322/tboiwotl-v1.666.swf",t:"flash"},
+  // FNF
+  {n:"Friday Night Funkin'",u:"https://drive.google.com/file/d/1bF_gBLqInZQCBH80tPr0qVaWVWbnFgH_/view",t:"fnf"},
+  {n:"FNF vs Whitty",u:"https://drive.google.com/file/d/1sKTnwyYoV3z01peJeoQoRX6NQEdTxwEu/view",t:"fnf"},
+  {n:"FNF vs Shaggy",u:"https://drive.google.com/file/d/1I9DN4vVD4xca_dxoATHXk1aTdbMaXAh5/view",t:"fnf"},
+  {n:"FNF vs Tricky",u:"https://drive.google.com/file/d/1XyFyiPL1T_7TjWwovpQt7PHEoFMJS7P3/view",t:"fnf"},
+  {n:"FNF vs Sonic.EXE",u:"https://drive.google.com/file/d/11mrbdheaMxxOdMEx5DfYKsaqmrA0W3a4/view",t:"fnf"},
+  {n:"FNF Indie Cross",u:"https://drive.google.com/file/d/1s7Li8L0qPsMSrCKV4d_rbG2-eOjvLS2r/view",t:"fnf"},
+  {n:"FNF Mario's Madness",u:"https://drive.google.com/file/d/1Nh62GqauJXRwpzwcZT2f2xX5joNBljEL/view",t:"fnf"},
+  {n:"FNF B-Sides",u:"https://drive.google.com/file/d/1EwIjqFJ0EzgZKsroSB0QYul972wsF9Q8/view",t:"fnf"},
+  {n:"FNF Soft",u:"https://drive.google.com/file/d/1KaePbMxPHGyqpPcfRbnH94Zdq3mooypa/view",t:"fnf"},
+  {n:"FNF Neo",u:"https://drive.google.com/file/d/1e8KWmlZRSXO5bMR9_88rdK1LB8YuKpPI/view",t:"fnf"},
+  {n:"FNF Hex",u:"https://drive.google.com/file/d/1gmeiqKHuAATMGYPUg-e6r9GIz3HlO0B2/view",t:"fnf"},
+  {n:"FNF vs QT",u:"https://drive.google.com/file/d/1DRY3NvwgtkjOWM0R_RGl3yg5j48xEyVo/view",t:"fnf"},
+  {n:"FNF Mid-Fight Masses",u:"https://drive.google.com/file/d/1Ldjubnid7Xk6u9zLMm9yOkEN01l_Ds-j/view",t:"fnf"},
+  {n:"FNF Dave & Bambi Golden Apple",u:"https://drive.google.com/file/d/1mK0hXsq6oaD_Xq8eGwPgiX7Pq4AcM7VF/view",t:"fnf"},
+  {n:"FNF Impostor v4",u:"https://drive.google.com/file/d/1yVYZV7vd7vjdZ03KP4fqagwfsWZWirP4/view",t:"fnf"},
+  {n:"FNF Wednesday's Infidelity",u:"https://drive.google.com/file/d/1a7PLzMl3Tr1w2stw3i7Sh-7euCYpXs_u/view",t:"fnf"},
+  {n:"FNF Doki Takeover Plus",u:"https://drive.google.com/file/d/1zqu0hXWhIXia55OZPlWP3ju6bkv1jkBd/view",t:"fnf"},
+  {n:"FNF Pibby Apocalypse",u:"https://drive.google.com/file/d/1hbx31DxmqalnhMm43mF0IXIFWfexVdgl/view",t:"fnf"},
+  // FLASH
+  {n:"Happy Wheels",u:"https://drive.google.com/file/d/13jcuwX7tgPFaANNGs9RaSAJGZRqcVU_Q/view",t:"flash"},
+  {n:"BTD 4",u:"https://drive.google.com/file/d/1uqfn4suDW4dTyLZRHKaUR02gYqgwi310/view",t:"flash"},
+  {n:"Super Smash Flash 2",u:"https://drive.google.com/file/d/1DPlZpUSPyMedJ5e67eQNtGLfJqc4vWUO/view",t:"flash"},
+  {n:"Madness Combat",u:"https://drive.google.com/file/d/1axCZJlbkq08uN4oBibVoxpXrpsPUMhZ5/view",t:"flash"},
+  {n:"Fireboy and Watergirl",u:"https://drive.google.com/file/d/1tAPh4rqRyCwNSd53FVugLM4ut1RfJYUN/view",t:"flash"},
+  {n:"Fireboy and Watergirl 2",u:"https://drive.google.com/file/d/1vnVS7tMwgsBGM9GqCw3t3n7_RbYjbh-F/view",t:"flash"},
+  {n:"Fireboy and Watergirl 3",u:"https://drive.google.com/file/d/1kY-7n3eBY3PXhBJhZ-O09fREip2OK42O/view",t:"flash"},
+  {n:"Run",u:"https://drive.google.com/file/d/13S4hmU7QaqG-B6sykjngm3C7V6U4LTFV/view",t:"flash"},
+  {n:"Run 2",u:"https://drive.google.com/file/d/1Ej0-flk1n-kPAJAHwQ7joXva9OWxhrUX/view",t:"flash"},
+  {n:"Fancy Pants Adventure",u:"https://drive.google.com/file/d/13ay_YaJMC0ebn6MYAzUCyNOH4AcySg1K/view",t:"flash"},
+  {n:"Fancy Pants Adventure 2",u:"https://drive.google.com/file/d/1aPjH0oBQ-lVX0EbdXjzsZo650j-TPN4p/view",t:"flash"},
+  {n:"Hobo",u:"https://drive.google.com/file/d/1uF2V98tS6kkLDOga0sABRfHJnAcrCif3/view",t:"flash"},
+  {n:"Hobo 2",u:"https://drive.google.com/file/d/1ZudXrrzTCNEUPZ8uZmJDp-8KWY7eSLlC/view",t:"flash"},
+  {n:"The Impossible Quiz",u:"https://drive.google.com/file/d/1tsdgFWj2GIO6Uz8kvhmn4jLCP-Og2bqs/view",t:"flash"},
+  {n:"The Impossible Quiz 2",u:"https://drive.google.com/file/d/16p1jhSzo3E9Z2QC2g_Egz-Q742W168pO/view",t:"flash"},
+  {n:"Duck Life",u:"https://drive.google.com/file/d/1p4FeH2PoayIYm-CCmmy-Yqu3vaMvNW8Q/view",t:"flash"},
+  {n:"Duck Life 4",u:"https://drive.google.com/file/d/1hWJeKydzTjqxNas7_SnGzkenIgWeVn0j/view",t:"flash"},
+  {n:"Learn to Fly",u:"https://drive.google.com/file/d/1BBBHlTwi5L2_eeCvtDz8YmaJTJgaRIfo/view",t:"flash"},
+  {n:"Learn to Fly 2",u:"https://drive.google.com/file/d/1_uuFKQTKHoHU0iMSUb7dr-wVmlXCYgAd/view",t:"flash"},
+  {n:"Papa's Pizzeria",u:"https://drive.google.com/file/d/1OPC6NVM7j8Lq1p6_boBDhMW3Lg_kzxVy/view",t:"flash"},
+  {n:"Papa's Burgeria",u:"https://drive.google.com/file/d/15Jwb266J7s5FILDsNWb27KnNXSandJft/view",t:"flash"},
+  {n:"Papa's Freezeria",u:"https://drive.google.com/file/d/1TZ8kpLbFjjNPXlUt7BiXBSg6ksxotCas/view",t:"flash"},
+  {n:"Papa's Cupcakeria",u:"https://drive.google.com/file/d/1T_MUl91rbVWi1iiki85gGQRKbJRbXyUf/view",t:"flash"},
+  {n:"Papa's Sushiria",u:"https://drive.google.com/file/d/134hen0kTCX30MQ9Bnlt1ExYFSmh2_Pfx/view",t:"flash"},
+  {n:"Papa's Pancakeria",u:"https://drive.google.com/file/d/1uxyQAfvwQNDkpik4E0vZSMOrlDXc4BHy/view",t:"flash"},
+  {n:"Papa's Bakeria",u:"https://drive.google.com/file/d/1gMJph9k8xUi6xzP-RB3rCsYeydr9PGdL/view",t:"flash"},
+  {n:"Parking Fury",u:"https://drive.google.com/file/d/1HBjsZIPWLUeE8Z1keWpSP0A3VpBph7nQ/view",t:"flash"},
+  {n:"Parking Fury 2",u:"https://drive.google.com/file/d/1J6Itti_m1Bc3ArwnrKavdTZLQA7DO2Ig/view",t:"flash"},
+  {n:"Parking Fury 3",u:"https://drive.google.com/file/d/1pA6ULV_d0lupUMyf_T0flqbYTtUx7dhj/view",t:"flash"},
+  {n:"Bloons",u:"https://drive.google.com/file/d/1nZV5EWBBueJcw4dApBnGxXdgAIV5I_gY/view",t:"flash"},
+  {n:"Bloons 2",u:"https://drive.google.com/file/d/1lvSIpgnEoQe8n02vlL21d4D1USwaFQBw/view",t:"flash"},
+  {n:"BTD 1",u:"https://drive.google.com/file/d/1IuKZDCSQVze5l7wCrbTl602Jwcpg9u_U/view",t:"flash"},
+  {n:"BTD 5",u:"https://drive.google.com/file/d/1ZDXA4Xj7ANbSPYXJFuZyNQu-iWFqdg5w/view",t:"flash"},
+  {n:"Gun Mayhem",u:"https://drive.google.com/file/d/1jNWlbJxKQjKecqhDenKl5SJsSr_z5_dL/view",t:"flash"},
+  {n:"Gun Mayhem 2",u:"https://drive.google.com/file/d/1mrLykWbOaYPZqZ63FLigOMURCfCjosCo/view",t:"flash"},
+  {n:"Stick War",u:"https://drive.google.com/file/d/1c8SQxALNJs_p183PvBTw_IgauubkYnzs/view",t:"flash"},
+  {n:"Stick War 2",u:"https://drive.google.com/file/d/1omhT1AU7M1Yi6p7zSIF1yvSdXoHLDj5r/view",t:"flash"},
+  {n:"Age of War",u:"https://drive.google.com/file/d/1RGm7NZ_M3slV0fTSSRlTp3Rpg9fTzVPo/view",t:"flash"},
+  {n:"Age of War 2",u:"https://drive.google.com/file/d/1YjMv3pjLUWqwNP2bFFGRW7AC9BTHBnxP/view",t:"flash"},
+  {n:"Burrito Bison",u:"https://drive.google.com/file/d/1oRZP-GVLExFB1J1HAHSXJDtB6FEkqVBD/view",t:"flash"},
+  {n:"Strike Force Heroes",u:"https://drive.google.com/file/d/165Bga2wlDBAwFXcch8CpjXDqrmx3pkmj/view",t:"flash"},
+  {n:"Strike Force Heroes 2",u:"https://drive.google.com/file/d/141HLGoITLW-MJ2-SAVZ_DDe2bj6JqkhC/view",t:"flash"},
+  {n:"Strike Force Heroes 3",u:"https://drive.google.com/file/d/1ApUllzz8sZZR0-SRTpW4XOQ71eg35_gc/view",t:"flash"},
+  {n:"Jacksmith",u:"https://drive.google.com/file/d/1hSZR4OdVzKTrmCaITWkF060yswtsKAqT/view",t:"flash"},
+  {n:"Riddle School",u:"https://drive.google.com/file/d/1K_bEEYnVCTWCD4614-RMP1J0A46rK2Dh/view",t:"flash"},
+  {n:"Riddle School 2",u:"https://drive.google.com/file/d/1x2O0mXFqfzenkVNMO61gcGFIXW41iqkV/view",t:"flash"},
+  {n:"Riddle School 3",u:"https://drive.google.com/file/d/14qvgIvJczf93IUOKdHkcNxsNN1RRYDdZ/view",t:"flash"},
+  {n:"Swords and Sandals 2",u:"https://drive.google.com/file/d/1_J1y_DDSyc2HICQ_w7nSCdj7M9E5UPXF/view",t:"flash"},
+  {n:"Swords and Souls",u:"https://drive.google.com/file/d/1tOECC-X_SIeNp6nJiUQJi4WuhJ2Oh0at/view",t:"flash"},
+  {n:"Super Mario 63",u:"https://drive.google.com/file/d/1XW9eTDsp3Kw-KP05W9uvj0nNnrP-FJMr/view",t:"flash"},
+  {n:"World's Hardest Game",u:"https://drive.google.com/file/d/1Z28_uRur7Zr1J03WS7b3zN1HSnGxpZ9g/view",t:"flash"},
+  {n:"World's Hardest Game 2",u:"https://drive.google.com/file/d/18y2klLFyAfiyfkw3iFG2i9e1tYgeywSy/view",t:"flash"},
+  {n:"Electric Man 2",u:"https://drive.google.com/file/d/1ZV9rmfv8b5R_su7RXVTU-bjF7Jkn0n-e/view",t:"flash"},
+  {n:"Rebuild 2",u:"https://drive.google.com/file/d/1mNbj4sAfJoc4E9KYqpu-wuzjBLomhXAH/view",t:"flash"},
+  {n:"Earn to Die",u:"https://drive.google.com/file/d/1waVfBJ_BPG1SbD_bARLJY_4TCyj7oP44/view",t:"flash"},
+  {n:"Earn to Die 2",u:"https://drive.google.com/file/d/1caoA3Gw8pImRyBx_wwKP3r2Yvp-KOzS5/view",t:"flash"},
+  {n:"The Last Stand 2",u:"https://drive.google.com/file/d/1mWHpcuGlV-k3q91Qs56o0wSns2zMX_hD/view",t:"flash"},
+  {n:"The Last Stand: Union City",u:"https://drive.google.com/file/d/1Ut8MqzlAZ_MIElRK6BFBAkiIHIsr9SZy/view",t:"flash"},
+  {n:"Troll Face Quest 1",u:"https://drive.google.com/file/d/17p5hkEVsOPIjmacP6mR7TUlFm2nCWCOA/view",t:"flash"},
+  {n:"Troll Face Quest 2",u:"https://drive.google.com/file/d/1W7SBg26pV0YHHFq9fG1inE5rKneBsXut/view",t:"flash"},
+  {n:"QWOP",u:"https://drive.google.com/file/d/1oAR0heli328tssjSI3uLFlsIZN2nkAMk/view",t:"flash"},
+  {n:"Doodle Jump",u:"https://drive.google.com/file/d/1GkXZrRGxUwNT6wOtYASkt52AeKrgsaSP/view",t:"flash"},
+  // EMULATED
+  {n:"Super Mario 64",u:"https://drive.google.com/file/d/1oJLeN8FFCe8ar9BG1Elv3yq086C0zgx0/view",t:"emulated"},
+  {n:"Mario Kart 64",u:"https://drive.google.com/file/d/1pIk91DyxKya9V8Tnf7glHJiPx_1hJtDu/view",t:"emulated"},
+  {n:"Super Smash Bros N64",u:"https://drive.google.com/file/d/1PbLO7YweOQCD-qhJk9mRf04RGL9ZHB2-/view",t:"emulated"},
+  {n:"Ocarina of Time",u:"https://drive.google.com/file/d/1XtFCHCxF-EJmV_WPuNNy36b-pxwtL_OM/view",t:"emulated"},
+  {n:"Majora's Mask",u:"https://drive.google.com/file/d/1QsMaIxjcFIq3m5AqI5ZDp_x9D0zIYr5X/view",t:"emulated"},
+  {n:"Donkey Kong 64",u:"https://drive.google.com/file/d/1IKdiDcAHaQ1gL8LOD2SO_QdjgyM93daZ/view",t:"emulated"},
+  {n:"Paper Mario N64",u:"https://drive.google.com/file/d/1fU26lMtjVkhMblDE6HLAN7akJ6rQjaGv/view",t:"emulated"},
+  {n:"Banjo-Kazooie",u:"https://drive.google.com/file/d/1vF4VH8RToTVlH2fFYKzvHX9oRugE6iuE/view",t:"emulated"},
+  {n:"GoldenEye 007",u:"https://drive.google.com/file/d/1OsSfhCVn3xwP5i9VyuIX7dyQeGUvs_jk/view",t:"emulated"},
+  {n:"Pokemon FireRed",u:"https://drive.google.com/file/d/1zwiOplZkLN6cbHRVmfR2Wo72FEr7ROm2/view",t:"emulated"},
+  {n:"Pokemon Emerald",u:"https://drive.google.com/file/d/1ucirKUZiBex2r-Ikc1qMYsPNG4_5VNjm/view",t:"emulated"},
+  {n:"Pokemon Crystal",u:"https://drive.google.com/file/d/1lWPdHQWPUSRsX4PNNh6bMI_3OZPPlFud/view",t:"emulated"},
+  {n:"Pokemon Platinum",u:"https://drive.google.com/file/d/12fXhRRDlpnM2jg4EABw-hJjSKWfZO6TU/view",t:"emulated"},
+  {n:"Pokemon HeartGold",u:"https://drive.google.com/file/d/1QVyAHNyIeoDwLDF2iinjqXgRyOSb5aNA/view",t:"emulated"},
+  {n:"Pokemon Black",u:"https://drive.google.com/file/d/1VrzlZrSBAjnajnjkcZMCq1WOdn6-biOm/view",t:"emulated"},
+  {n:"Pokemon White",u:"https://drive.google.com/file/d/1NeNw61W3ScmC8v8UNRl9CiS-tD2nv20Z/view",t:"emulated"},
+  {n:"Pokemon Unbound",u:"https://drive.google.com/file/d/1fa_3fMlkp355aNr_2tsUkp7zeJt4BWqW/view",t:"emulated"},
+  {n:"Pokemon Radical Red",u:"https://drive.google.com/file/d/1Qw8TT81dTZM0xpIdOMKP-QZEPJeZ_8iC/view",t:"emulated"},
+  {n:"Pokemon Emerald Rogue",u:"https://drive.google.com/file/d/1VfPiSK9VBShGNc6sP3ygsf7-GllYzpVN/view",t:"emulated"},
+  {n:"Super Mario World",u:"https://drive.google.com/file/d/12TNnqSWbPP4ajakAygcIaFoIoeeyXmWf/view",t:"emulated"},
+  {n:"Super Mario Bros 3",u:"https://drive.google.com/file/d/1q1SQdywOQBdU2GQOBh27mlgx9-cv3aUp/view",t:"emulated"},
+  {n:"Donkey Kong Country",u:"https://drive.google.com/file/d/1qGhZTzI02T29zY7FJA4E75CzuUczUIBs/view",t:"emulated"},
+  {n:"Donkey Kong Country 2",u:"https://drive.google.com/file/d/1IPMAT543CixI7ykybjWBWwGclgYjy9Y9/view",t:"emulated"},
+  {n:"Chrono Trigger",u:"https://drive.google.com/file/d/1sKGyQTMKjeu93e5BYAGcfoAQXrz9dJP9/view",t:"emulated"},
+  {n:"Super Metroid",u:"https://drive.google.com/file/d/1BCWTEhty4o2a0M5xWMdM7LwMgomf55bf/view",t:"emulated"},
+  {n:"Kirby Super Star",u:"https://drive.google.com/file/d/15T1rBO-xuh-6eRFll6epZIVtDb_9ztnU/view",t:"emulated"},
+  {n:"New Super Mario Bros DS",u:"https://drive.google.com/file/d/1uyQvi1CGGe9I_WPAfu16hjBvF-1e5I4M/view",t:"emulated"},
+  {n:"Mario Kart DS",u:"https://drive.google.com/file/d/1s7m935WOWN1EM6EB8buUid7bbZxKsPa_/view",t:"emulated"},
+  {n:"Mario & Luigi: Bowser's Inside Story",u:"https://drive.google.com/file/d/1Oe9IoD8oI7mF1BPwMjC8-z2iJkLwoE4Q/view",t:"emulated"},
+  {n:"Sonic the Hedgehog",u:"https://drive.google.com/file/d/1fZZt54aoygf1qkGsYB3HUeHSeQ1nSNcC/view",t:"emulated"},
+  {n:"Sonic the Hedgehog 2",u:"https://drive.google.com/file/d/1dBlhwOV8eLiTJ_GRRksCOUSBp6mgUZxJ/view",t:"emulated"},
+  {n:"Sonic 3 & Knuckles",u:"https://drive.google.com/file/d/1wgAxyed2gJgekM4eXlkah1uyj47NnZPj/view",t:"emulated"},
+  {n:"Final Fantasy VII",u:"https://drive.google.com/file/d/13wJl_6BtOljdKG0pbyUWAh-DOAWWtCTm/view",t:"emulated"},
+  {n:"Crash Bandicoot PS1",u:"https://drive.google.com/file/d/1g_zqgSDEI8Ggh2uzXhsL6zw1d2wsSCYH/view",t:"emulated"},
+  {n:"Mortal Kombat 4",u:"https://drive.google.com/file/d/1xHAKZNMXW6y7ff5s9Aa4CxZjAPr9A6ku/view",t:"emulated"},
+  {n:"Doom (MS-DOS)",u:"https://drive.google.com/file/d/1nb8YlAFYC1s_UiuZXCFzYXazyzqK8IPx/view",t:"emulated"},
+  {n:"Mega Man X",u:"https://drive.google.com/file/d/15zESqXlKbzX3fK9vQnJk224yEQQilE08/view",t:"emulated"},
+  {n:"Mega Man 2",u:"https://drive.google.com/file/d/1ROtEyjHy6J0zWRu65V3heeuQulD-CyUc/view",t:"emulated"},
+  {n:"Metroid Fusion",u:"https://drive.google.com/file/d/1W_jrXR-6G25iA74adLHX3uNf4SGvV0pW/view",t:"emulated"},
+  {n:"Castlevania: SOTN",u:"https://drive.google.com/file/d/1ON-bB9HDnzASMscToCBLEf-DxqtRZ-bc/view",t:"emulated"},
+  {n:"Kirby 64",u:"https://drive.google.com/file/d/1MvGfK7rtC4NVpUmQuz-SGXRyRNKrQR4F/view",t:"emulated"},
+  {n:"Star Fox 64",u:"https://drive.google.com/file/d/1jWumZ8K20tDPLzTXyb9AHB424KOrub1X/view",t:"emulated"},
+  {n:"Animal Crossing DS",u:"https://drive.google.com/file/d/1yZQZqOO-wR6cMpPMshVmyckanhcJMI2j/view",t:"emulated"},
+];
+
+const TL = {html5:'HTML5',flash:'Flash ⚡',emulated:'Emulated',fnf:'FNF',cdn:'CDN'};
+let curFilter = 'all', curSearch = '';
+
+// ══════════════════════════════════════════
+//  PASSWORD
+// ══════════════════════════════════════════
+const CORRECT_PW = '1234';
+function checkPW() {
+  const val = document.getElementById('pw-input').value;
+  const inp = document.getElementById('pw-input');
+  const err = document.getElementById('pw-err');
+  if (val === CORRECT_PW) {
+    const screen = document.getElementById('pw-screen');
+    screen.classList.add('hidden');
+    setTimeout(() => screen.remove(), 600);
+    err.textContent = '';
+  } else {
+    err.textContent = '✕ INCORRECT CODE';
+    inp.classList.add('pw-wrong');
+    inp.value = '';
+    setTimeout(() => inp.classList.remove('pw-wrong'), 500);
+  }
+}
+// Allow pressing Enter on password screen
+document.getElementById('pw-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') checkPW();
+});
+//  Drive files are single-file HTML zips.
+//  We fetch the raw download, get the HTML text,
+//  open about:blank and write it in directly.
+//  Flash: fetch as ArrayBuffer → blob URL → Ruffle.
+//  CDN: same fetch→write approach, no Drive redirect.
+// ══════════════════════════════════════════
+
+function getDriveId(url) {
+  const m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  return m ? m[1] : null;
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// The minimal close-bar window shell
+function shellHTML(name, inner) {
+  return `<!DOCTYPE html><html><head><title>${esc(name)}</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{background:#000;display:flex;flex-direction:column;height:100vh;overflow:hidden;font-family:monospace}
+#_b{background:#111;border-bottom:1px solid #333;padding:6px 14px;display:flex;align-items:center;flex-shrink:0}
+#_b span{color:#e63946;font-weight:bold;flex:1;font-size:13px}
+#_b button{background:#e63946;border:none;color:#fff;font-size:11px;padding:4px 12px;cursor:pointer;border-radius:4px}
+#_c{flex:1;display:flex;position:relative}</style></head><body>
+<div id="_b"><span>▶ ${esc(name)}</span><button onclick="window.close()">✕ CLOSE</button></div>
+<div id="_c">${inner}</div></body></html>`;
+}
+
+function openGame(url, name, type) {
+  // ── Built-in Snake ────────────────────────────────────
+  if (url === '__snake__') { launchSnake(); return; }
+  const isCDN = url.includes('jsdelivr.net') || url.includes('rawcdn.githack') || url.includes('raw.githubusercontent.com');
+  if (isCDN) {
+    showToast('Loading ' + name + '…');
+    if (url.endsWith('.swf')) {
+      // Flash via CDN → fetch binary → Ruffle blob
+      fetch(url)
+        .then(r => { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
+        .then(buf => launchRuffle(name, buf))
+        .catch(() => { showToast('Failed — opening directly'); window.open(url, '_blank'); });
+    } else {
+      // HTML via CDN → fetch text → about:blank
+      fetch(url)
+        .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
+        .then(html => writeBlank(name, html))
+        .catch(() => { showToast('Failed — opening directly'); window.open(url, '_blank'); });
+    }
+    return;
+  }
+
+  // ── Online games (not Drive) ─────────────────────────
+  if (!url.includes('drive.google.com')) {
+    const w = window.open('about:blank', '_blank');
+    if (!w) { alert('Please allow popups to play games!'); return; }
+    w.document.open();
+    w.document.write(shellHTML(name, `<iframe src="${url}" style="position:absolute;inset:0;width:100%;height:100%;border:none;" allowfullscreen allow="fullscreen *"></iframe>`));
+    w.document.close();
+    return;
+  }
+
+  // ── Google Drive ─────────────────────────────────────
+  const id = getDriveId(url);
+  if (!id) { window.open(url, '_blank'); return; }
+
+  // Direct download URL — Google will serve the file content
+  const dlURL = `https://drive.google.com/uc?export=download&id=${id}&confirm=t`;
+  showToast('Loading ' + name + '… (allow popups!)');
+
+  if (type === 'flash') {
+    // Fetch SWF binary → Ruffle in about:blank
+    fetch(dlURL)
+      .then(r => { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
+      .then(buf => launchRuffle(name, buf))
+      .catch(err => {
+        console.warn('Drive SWF fetch failed:', err);
+        showToast('Using Drive preview…');
+        openDrivePreview(id, name);
+      });
+  } else {
+    // Fetch HTML text → write into about:blank
+    fetch(dlURL)
+      .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
+      .then(html => {
+        // Check if Drive returned a virus/download warning page instead of the game
+        if (html.includes('Google Drive - Virus scan warning') || html.includes('confirm=') && html.includes('<form')) {
+          // Try to extract the real download link from the warning page
+          const m = html.match(/action="([^"]*uc\?[^"]*)"/);
+          if (m) {
+            const realURL = m[1].replace(/&amp;/g, '&');
+            return fetch(realURL).then(r2 => r2.text()).then(html2 => writeBlank(name, html2));
+          }
+          // Fallback to preview
+          showToast('File too large for direct load — using preview');
+          openDrivePreview(id, name);
+        } else {
+          writeBlank(name, html);
+        }
+      })
+      .catch(err => {
+        console.warn('Drive HTML fetch failed:', err);
+        showToast('Using Drive preview…');
+        openDrivePreview(id, name);
+      });
+  }
+}
+
+function writeBlank(name, html) {
+  const w = window.open('about:blank', '_blank');
+  if (!w) { alert('Please allow popups to play games!'); return; }
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+  try { w.document.title = name; } catch(e) {}
+  showToast(name + ' launched!');
+}
+
+function launchRuffle(name, arrayBuffer) {
+  const blob = new Blob([arrayBuffer], { type: 'application/x-shockwave-flash' });
+  const swfURL = URL.createObjectURL(blob);
+  const w = window.open('about:blank', '_blank');
+  if (!w) { alert('Please allow popups!'); return; }
+  w.document.open();
+  w.document.write(`<!DOCTYPE html><html><head><title>${esc(name)}</title>
+<script src="https://unpkg.com/@ruffle-rs/ruffle"><\/script>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{background:#000;display:flex;flex-direction:column;height:100vh;overflow:hidden;font-family:monospace}
+#_b{background:#111;border-bottom:1px solid #333;padding:6px 14px;display:flex;align-items:center;flex-shrink:0}
+#_b span{color:#e63946;font-weight:bold;flex:1;font-size:13px}
+#_b button{background:#e63946;border:none;color:#fff;font-size:11px;padding:4px 12px;cursor:pointer;border-radius:4px}
+#_s{flex:1;display:flex}</style></head><body>
+<div id="_b"><span>▶ ${esc(name)}</span><button onclick="window.close()">✕ CLOSE</button></div>
+<div id="_s"></div>
+<script>
+window.addEventListener('load', function() {
+  var ruffle = window.RufflePlayer.newest();
+  var player = ruffle.createPlayer();
+  player.style.width = '100%';
+  player.style.height = '100%';
+  player.style.flex = '1';
+  document.getElementById('_s').appendChild(player);
+  player.load('${swfURL}');
+});
+<\/script></body></html>`);
+  w.document.close();
+  showToast(name + ' launched!');
+}
+
+function openDrivePreview(id, name) {
+  const w = window.open('about:blank', '_blank');
+  if (!w) { window.open(`https://drive.google.com/file/d/${id}/preview`, '_blank'); return; }
+  w.document.open();
+  w.document.write(shellHTML(name, `<iframe src="https://drive.google.com/file/d/${id}/preview" style="position:absolute;inset:0;width:100%;height:100%;border:none;" allowfullscreen></iframe>`));
+  w.document.close();
+}
+
+// ══════════════════════════════════════════
+//  SNAKE GAME (built-in)
+// ══════════════════════════════════════════
+function launchSnake() {
+  const w = window.open('about:blank', '_blank');
+  if (!w) { alert('Allow popups!'); return; }
+  w.document.open();
+  w.document.write(`<!DOCTYPE html><html><head><title>Snake</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;font-family:'Courier New',monospace;color:#00ff41;overflow:hidden;}
+#bar{position:fixed;top:0;left:0;right:0;background:#111;border-bottom:1px solid #222;padding:6px 14px;display:flex;align-items:center;gap:16px;z-index:10;}
+#bar span{color:#e63946;font-weight:bold;font-size:13px;flex:1;}
+#bar .sc{color:#00ff41;font-size:12px;}
+#bar button{background:#e63946;border:none;color:#fff;font-size:11px;padding:4px 12px;cursor:pointer;border-radius:4px;}
+#wrap{display:flex;flex-direction:column;align-items:center;gap:16px;margin-top:44px;}
+h2{font-size:13px;letter-spacing:4px;color:#00ff41;text-transform:uppercase;}
+canvas{border:2px solid #00ff41;box-shadow:0 0 24px rgba(0,255,65,0.4);background:#050f05;display:block;}
+#info{font-size:11px;color:#555;letter-spacing:2px;text-align:center;}
+#over{position:fixed;inset:0;background:rgba(0,0,0,0.88);display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;}
+#over.show{display:flex;}
+#over h3{font-size:22px;letter-spacing:4px;color:#e63946;}
+#over p{font-size:13px;color:#00ff41;letter-spacing:2px;}
+#over button{background:#00ff41;border:none;color:#000;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;padding:10px 28px;cursor:pointer;letter-spacing:3px;margin-top:6px;}
+</style></head><body>
+<div id="bar"><span>▶ Snake</span><span class="sc">Score: <b id="sc">0</b> &nbsp; High: <b id="hi">0</b></span><button onclick="window.close()">✕ CLOSE</button></div>
+<div id="wrap">
+  <h2>// SNAKE //</h2>
+  <canvas id="c" width="400" height="400"></canvas>
+  <div id="info">WASD / Arrow Keys to move · P to pause</div>
+</div>
+<div id="over"><h3>GAME OVER</h3><p id="fs">Score: 0</p><button onclick="restart()">▶ PLAY AGAIN</button></div>
+<script>
+const canvas=document.getElementById('c');
+const ctx=canvas.getContext('2d');
+const SZ=20,COLS=20,ROWS=20;
+let snake,dir,nextDir,food,score,hi=0,running,paused,loop;
+const COLORS={head:'#00ff41',body:'#007a20',food:'#e63946',eye:'#000'};
+
+function init(){
+  snake=[{x:10,y:10},{x:9,y:10},{x:8,y:10}];
+  dir={x:1,y:0}; nextDir={x:1,y:0};
+  spawnFood(); score=0; running=true; paused=false;
+  document.getElementById('over').classList.remove('show');
+  document.getElementById('sc').textContent=0;
+  clearInterval(loop);
+  loop=setInterval(tick,120);
+}
+
+function spawnFood(){
+  do{ food={x:Math.floor(Math.random()*COLS),y:Math.floor(Math.random()*ROWS)}; }
+  while(snake.some(s=>s.x===food.x&&s.y===food.y));
+}
+
+function tick(){
+  if(!running||paused)return;
+  dir=nextDir;
+  const head={x:snake[0].x+dir.x,y:snake[0].y+dir.y};
+  // wall collision
+  if(head.x<0||head.x>=COLS||head.y<0||head.y>=ROWS){die();return;}
+  // self collision
+  if(snake.some(s=>s.x===head.x&&s.y===head.y)){die();return;}
+  snake.unshift(head);
+  if(head.x===food.x&&head.y===food.y){
+    score++; if(score>hi)hi=score;
+    document.getElementById('sc').textContent=score;
+    document.getElementById('hi').textContent=hi;
+    spawnFood();
+  } else { snake.pop(); }
+  draw();
+}
+
+function draw(){
+  ctx.fillStyle='#050f05'; ctx.fillRect(0,0,canvas.width,canvas.height);
+  // grid dots
+  ctx.fillStyle='rgba(0,255,65,0.04)';
+  for(let x=0;x<COLS;x++) for(let y=0;y<ROWS;y++) ctx.fillRect(x*SZ+9,y*SZ+9,2,2);
+  // food pulse
+  const pulse=0.7+0.3*Math.sin(Date.now()/200);
+  ctx.fillStyle=COLORS.food;
+  ctx.shadowColor=COLORS.food; ctx.shadowBlur=12*pulse;
+  ctx.beginPath(); ctx.arc(food.x*SZ+SZ/2,food.y*SZ+SZ/2,SZ/2-3,0,Math.PI*2); ctx.fill();
+  ctx.shadowBlur=0;
+  // snake body
+  snake.forEach((seg,i)=>{
+    const t=i/snake.length;
+    const r=Math.round(0+(0-0)*t); const g=Math.round(255+(122-255)*t); const b=Math.round(65+(32-65)*t);
+    ctx.fillStyle=i===0?COLORS.head:\`rgb(\${Math.round(0+(0)*t)},\${Math.round(255-133*t)},\${Math.round(65-33*t)})\`;
+    ctx.shadowColor=i===0?COLORS.head:'transparent'; ctx.shadowBlur=i===0?10:0;
+    const pad=i===0?1:2;
+    ctx.beginPath();
+    ctx.roundRect(seg.x*SZ+pad,seg.y*SZ+pad,SZ-pad*2,SZ-pad*2,i===0?6:4);
+    ctx.fill();
+  });
+  ctx.shadowBlur=0;
+  // eyes on head
+  if(snake.length>0){
+    const h=snake[0]; const ex=h.x*SZ+SZ/2,ey=h.y*SZ+SZ/2;
+    const ox=dir.x*4, oy=dir.y*4;
+    const px=dir.y*3, py=-dir.x*3;
+    ctx.fillStyle='#000';
+    [[ex+ox+px,ey+oy+py],[ex+ox-px,ey+oy-py]].forEach(([ex2,ey2])=>{
+      ctx.beginPath(); ctx.arc(ex2,ey2,2.5,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#fff';
+      ctx.beginPath(); ctx.arc(ex2+0.8,ey2-0.8,0.8,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#000';
+    });
+  }
+  if(paused){
+    ctx.fillStyle='rgba(0,0,0,0.55)'; ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle='#00ff41'; ctx.font='bold 18px Courier New';
+    ctx.textAlign='center'; ctx.fillText('PAUSED',canvas.width/2,canvas.height/2);
+  }
+}
+
+function die(){
+  running=false; clearInterval(loop);
+  document.getElementById('fs').textContent='Score: '+score;
+  document.getElementById('over').classList.add('show');
+}
+
+function restart(){ init(); }
+
+document.addEventListener('keydown',e=>{
+  const map={ArrowUp:{x:0,y:-1},ArrowDown:{x:0,y:1},ArrowLeft:{x:-1,y:0},ArrowRight:{x:1,y:0},
+             w:{x:0,y:-1},s:{x:0,y:1},a:{x:-1,y:0},d:{x:1,y:0}};
+  if(map[e.key]){
+    const nd=map[e.key];
+    if(nd.x!==-dir.x||nd.y!==-dir.y) nextDir=nd;
+    e.preventDefault();
+  }
+  if(e.key==='p'||e.key==='P'){paused=!paused; if(!paused)draw();}
+});
+
+// Touch support
+let tx=0,ty=0;
+canvas.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+canvas.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>Math.abs(dy)){nextDir=dx>0?{x:1,y:0}:{x:-1,y:0};}
+  else{nextDir=dy>0?{x:0,y:1}:{x:0,y:-1};}
+},{passive:true});
+
+// Rounded rect polyfill
+if(!CanvasRenderingContext2D.prototype.roundRect){
+  CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){
+    this.moveTo(x+r,y);this.lineTo(x+w-r,y);this.quadraticCurveTo(x+w,y,x+w,y+r);
+    this.lineTo(x+w,y+h-r);this.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+    this.lineTo(x+r,y+h);this.quadraticCurveTo(x,y+h,x,y+h-r);
+    this.lineTo(x,y+r);this.quadraticCurveTo(x,y,x+r,y);this.closePath();
+    return this;
+  };
+}
+
+init();
+<\/script></body></html>`);
+  w.document.close();
+}
+
+// ══════════════════════════════════════════
+//  GRID RENDER
+// ══════════════════════════════════════════
+function setFilter(f, el) {
+  curFilter = f;
+  document.querySelectorAll('.fbtn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderGames();
+}
+function filterGames() {
+  curSearch = document.getElementById('search').value.toLowerCase();
+  renderGames();
+}
+function renderGames() {
+  const grid = document.getElementById('game-grid');
+  const noRes = document.getElementById('no-res');
+  const filtered = GAMES.filter(g =>
+    (curFilter === 'all' || g.t === curFilter) &&
+    (!curSearch || g.n.toLowerCase().includes(curSearch))
+  );
+  document.getElementById('gcount').textContent = filtered.length;
+  if (!filtered.length) { grid.innerHTML = ''; noRes.classList.add('show'); return; }
+  noRes.classList.remove('show');
+  grid.innerHTML = filtered.map((g, i) => {
+    const safe = g.n.replace(/'/g, "\\'");
+    return `<a class="gcard" href="#" onclick="event.preventDefault();openGame('${g.u.replace(/'/g,"\\'")}','${safe}','${g.t}');" style="animation-delay:${Math.min(i*0.012,0.4)}s">
+  <div class="card-tip"><span class="tip-name">${g.n}</span><span style="color:var(--dim);font-size:9px;">${TL[g.t]||g.t}</span></div>
+  <div class="card-body">
+    <div class="card-name">${g.n}</div>
+    <div class="card-tag">${TL[g.t]||g.t}</div>
+  </div>
+</a>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════
+//  CLOAK
+// ══════════════════════════════════════════
+function cloakBlank() {
+  const w = window.open('about:blank', '_blank');
+  if (!w) { alert('Allow popups!'); return; }
+  w.document.open(); w.document.write(document.documentElement.outerHTML); w.document.close();
+  w.document.title = 'Google Classroom';
+  window.location.href = 'https://classroom.google.com';
+}
+function cloakBlob() {
+  const blob = new Blob([document.documentElement.outerHTML], {type:'text/html'});
+  const burl = URL.createObjectURL(blob);
+  const w = window.open(burl, '_blank');
+  if (!w) { alert('Allow popups!'); return; }
+  setTimeout(() => URL.revokeObjectURL(burl), 10000);
+  window.location.href = 'https://classroom.google.com';
+}
+
+// ══════════════════════════════════════════
+//  THEME
+// ══════════════════════════════════════════
+function setTheme(t, el) {
+  document.body.setAttribute('data-theme', t);
+  document.querySelectorAll('.th-opt').forEach(o => o.classList.remove('active'));
+  if (el) el.classList.add('active');
+  localStorage.setItem('mgs-theme', t);
+  document.getElementById('theme-panel').classList.remove('open');
+}
+function toggleThemePanel() {
+  document.getElementById('theme-panel').classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  const p = document.getElementById('theme-panel');
+  if (p.classList.contains('open') && !p.contains(e.target) && !e.target.closest('#toolbar')) p.classList.remove('open');
+});
+
+// ══════════════════════════════════════════
+//  SETTINGS
+// ══════════════════════════════════════════
+function openSettings() { document.getElementById('settings-panel').classList.add('open'); }
+function closeSettings() { document.getElementById('settings-panel').classList.remove('open'); }
+function applySettings() {
+  const title = document.getElementById('s-tab-title').value.trim() || 'Google Classroom';
+  const favicon = document.getElementById('s-favicon').value.trim();
+  document.title = title;
+  if (favicon) applyFavicon(favicon);
+  localStorage.setItem('mgs-settings', JSON.stringify({ title, favicon }));
+  showToast('Settings saved!');
+  closeSettings();
+}
+function loadSettings() {
+  try {
+    const s = JSON.parse(localStorage.getItem('mgs-settings') || '{}');
+    if (s.title) { document.getElementById('s-tab-title').value = s.title; document.title = s.title; }
+    if (s.favicon) { document.getElementById('s-favicon').value = s.favicon; applyFavicon(s.favicon); }
+  } catch(e) {}
+}
+function applyFavicon(url) {
+  let link = document.querySelector("link[rel~='icon']");
+  if (!link) { link = document.createElement('link'); link.rel = 'icon'; document.head.appendChild(link); }
+  link.href = url;
+}
+function setFaviconPreset(url, display) {
+  document.getElementById('s-favicon').value = url;
+  applyFavicon(url);
+  showToast('Favicon updated!');
+}
+
+// Tab close confirmation
+window.addEventListener('beforeunload', e => {
+  e.preventDefault();
+  e.returnValue = '';
+});
+
+// Panic key
+document.addEventListener('keydown', e => {
+  const tag = document.activeElement.tagName;
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+  const key = document.getElementById('s-panic-key')?.value || 'Escape';
+  const dest = document.getElementById('s-panic-dest')?.value || 'https://classroom.google.com';
+  if (e.key === key) window.location.href = dest;
+});
+
+// ══════════════════════════════════════════
+//  HTML RUNNER
+// ══════════════════════════════════════════
+function openHTMLRunner() { document.getElementById('html-runner').classList.add('open'); }
+function closeHTMLRunner() { document.getElementById('html-runner').classList.remove('open'); }
+function runHTML() { document.getElementById('html-preview').srcdoc = document.getElementById('html-editor').value; }
+function clearEditor() { document.getElementById('html-editor').value = ''; document.getElementById('html-preview').srcdoc = ''; }
+function fsPreview() {
+  const p = document.getElementById('html-preview');
+  if (p.requestFullscreen) p.requestFullscreen();
+  else if (p.webkitRequestFullscreen) p.webkitRequestFullscreen();
+}
+document.getElementById('html-editor').addEventListener('keydown', e => {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const s = e.target.selectionStart;
+    e.target.value = e.target.value.substring(0, s) + '  ' + e.target.value.substring(e.target.selectionEnd);
+    e.target.selectionStart = e.target.selectionEnd = s + 2;
+  }
+});
+
+// ══════════════════════════════════════════
+//  PROXY
+// ══════════════════════════════════════════
+function openProxy() { document.getElementById('proxy-panel').classList.add('open'); }
+function closeProxy() { document.getElementById('proxy-panel').classList.remove('open'); }
+function showPTab(tab, el) {
+  document.querySelectorAll('.pcnt').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
+  document.getElementById('proxy-' + tab).classList.add('active');
+  el.classList.add('active');
+}
+function loadP(fid, iid) { document.getElementById(fid).src = document.getElementById(iid).value; }
+
+// ══════════════════════════════════════════
+//  MUSIC PLAYER
+// ══════════════════════════════════════════
+const TRACKS = [
+  {title:"Stereo Madness (GD)", src:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"},
+  {title:"Chill Lo-Fi Beats",   src:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"},
+  {title:"Cyberpunk Vibes",     src:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"},
+  {title:"Electronic Dreams",   src:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3"},
+  {title:"Space Ambience",      src:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3"},
+  {title:"Mars Station Radio",  src:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3"},
+  {title:"Retro Wave",          src:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3"},
+  {title:"Boss Battle Theme",   src:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"},
+];
+let curT=0, isPlaying=false, shuffle=false, loop=false;
+const audio = document.getElementById('audio-el');
+
+function initPlayer() {
+  document.getElementById('track-list').innerHTML = TRACKS.map((t,i) => `
+    <div class="titem${i===curT?' playing':''}" id="ti-${i}" onclick="playTrack(${i})">
+      <span style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--dim);width:14px;">${i+1}</span>
+      <div class="vbars"><div class="vb"></div><div class="vb"></div><div class="vb"></div></div>
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${t.title}</span>
+    </div>`).join('');
+  audio.src = TRACKS[curT].src;
+  audio.volume = 0.7;
+  audio.addEventListener('timeupdate', updProg);
+  audio.addEventListener('ended', onEnd);
+}
+function playTrack(i) {
+  curT = i; audio.src = TRACKS[i].src; audio.play(); isPlaying = true;
+  document.getElementById('play-btn').textContent = '⏸';
+  document.getElementById('np-title').textContent = TRACKS[i].title;
+  document.querySelectorAll('.titem').forEach((el,j) => {
+    el.classList.toggle('playing', j===i);
+    el.querySelectorAll('.vb').forEach(b => { b.style.animation = j===i?'':'none'; b.style.height = j===i?'':'4px'; });
+  });
+  document.getElementById('hdr-vbars').querySelectorAll('.vb').forEach(b => b.style.animation='vba 0.6s ease-in-out infinite');
+}
+function togglePlay() {
+  if (isPlaying) { audio.pause(); isPlaying=false; document.getElementById('play-btn').textContent='▶'; document.getElementById('hdr-vbars').querySelectorAll('.vb').forEach(b=>b.style.animation='none'); }
+  else { audio.play(); isPlaying=true; document.getElementById('play-btn').textContent='⏸'; document.getElementById('hdr-vbars').querySelectorAll('.vb').forEach(b=>b.style.animation='vba 0.6s ease-in-out infinite'); }
+}
+function nextTrack() { playTrack(shuffle ? Math.floor(Math.random()*TRACKS.length) : (curT+1)%TRACKS.length); }
+function prevTrack() { playTrack((curT-1+TRACKS.length)%TRACKS.length); }
+function toggleShuffle() { shuffle=!shuffle; document.getElementById('shuf-btn').classList.toggle('act',shuffle); }
+function toggleLoop() { loop=!loop; audio.loop=loop; document.getElementById('loop-btn').classList.toggle('act',loop); }
+function setVol(v) { audio.volume = v; }
+function updProg() {
+  if (!audio.duration) return;
+  const p = (audio.currentTime/audio.duration)*100;
+  document.getElementById('pfill').style.width = p+'%';
+  document.getElementById('time-cur').textContent = fmt(audio.currentTime);
+  document.getElementById('time-dur').textContent = fmt(audio.duration);
+}
+function fmt(s) { const m=Math.floor(s/60); return m+':'+(Math.floor(s%60)+'').padStart(2,'0'); }
+function seekTo(e) { const b=document.getElementById('pbar2'); audio.currentTime=(e.offsetX/b.offsetWidth)*audio.duration; }
+function onEnd() { if (!loop) nextTrack(); }
+function toggleMusic() {
+  const p = document.getElementById('music-player');
+  if (!p.classList.contains('open') && !p.classList.contains('mini')) p.classList.add('mini');
+  else p.classList.toggle('open');
+}
+function toggleMusicExpand() {
+  const p = document.getElementById('music-player');
+  p.classList.toggle('open');
+  p.classList.toggle('mini', !p.classList.contains('open'));
+}
+
+// ══════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
+window.addEventListener('load', () => {
+  // Restore theme
+  const savedTheme = localStorage.getItem('mgs-theme');
+  if (savedTheme) {
+    document.body.setAttribute('data-theme', savedTheme);
+    const el = document.querySelector(`.th-opt[data-theme="${savedTheme}"]`);
+    if (el) { document.querySelectorAll('.th-opt').forEach(o=>o.classList.remove('active')); el.classList.add('active'); }
+  }
+
+  loadSettings();
+  renderGames();
+  initPlayer();
+
+  // Hide loader after short delay
+  setTimeout(() => {
+    const l = document.getElementById('loader');
+    l.classList.add('hidden');
+    setTimeout(() => l.remove(), 600);
+  }, 1000);
+});
+</script>
+</body>
+</html>
