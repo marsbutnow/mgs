@@ -184,6 +184,18 @@ main{position:relative;z-index:1;max-width:1500px;margin:0 auto;padding:24px 40p
 [data-theme="rainbow"] .t-mars,[data-theme="rainbow"] .t-rest{background:linear-gradient(90deg,#ff4466,#ffaa44,#ffdd44,#44ff88,#44ffcc,#4488ff,#aa44ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:rbS 3s linear infinite;background-size:200%;}
 @keyframes rbS{0%{background-position:0%}100%{background-position:200%}}
 
+/* ═══ LINKS ═══ */
+.links-grid{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px;}
+.link-card{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border);padding:12px 16px;text-decoration:none;color:var(--text);transition:all 0.2s;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));min-width:260px;flex:1 1 260px;max-width:480px;}
+.link-card:hover{border-color:var(--a2);background:var(--card-hover);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.4),0 0 16px var(--glow);}
+.link-icon{font-size:22px;flex-shrink:0;}
+.link-info{flex:1;min-width:0;}
+.link-name{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--text);transition:color 0.2s;}
+.link-card:hover .link-name{color:var(--a2);}
+.link-url{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--dim);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.link-arrow{font-size:16px;color:var(--dim);transition:all 0.2s;flex-shrink:0;}
+.link-card:hover .link-arrow{color:var(--a2);transform:translateX(3px);}
+
 footer{position:relative;z-index:1;border-top:1px solid var(--border);text-align:center;padding:22px 20px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--dim);}
 footer span{color:var(--a1);}
 footer a{color:var(--a2);text-decoration:none;}
@@ -257,6 +269,21 @@ footer a{color:var(--a2);text-decoration:none;}
 
 <main>
   <div id="no-res" class="no-res">NO GAMES FOUND</div>
+
+  <!-- LINKS SECTION -->
+  <div class="sec-label" style="margin-top:10px;">// Links</div>
+  <div class="links-grid">
+    <a class="link-card" href="https://www.canva.com/design/DAHGGYU0kt4/Ho6pfu_yTxkusH7bUBEesA/view" target="_blank">
+      <div class="link-icon">🎨</div>
+      <div class="link-info">
+        <div class="link-name">Mars Canva Design</div>
+        <div class="link-url">canva.com/design/DAHGGYU0kt4</div>
+      </div>
+      <div class="link-arrow">→</div>
+    </a>
+  </div>
+
+  <div class="sec-label">// Games</div>
   <div id="game-grid" class="game-grid"></div>
 </main>
 
@@ -283,6 +310,16 @@ footer a{color:var(--a2);text-decoration:none;}
           <button class="s-pre" onclick="document.getElementById('s-tab-title').value='Google Docs'">Google Docs</button>
           <button class="s-pre" onclick="document.getElementById('s-tab-title').value='Quizlet'">Quizlet</button>
           <button class="s-pre" onclick="document.getElementById('s-tab-title').value='Google Slides'">Slides</button>
+        </div>
+        <label class="s-label" style="margin-top:10px;">Tab Favicon URL</label>
+        <input id="s-favicon" class="s-inp" type="text" placeholder="https://example.com/favicon.ico">
+        <div class="s-presets" style="margin-top:6px;">
+          <button class="s-pre" onclick="setFaviconPreset('https://www.google.com/favicon.ico','https://www.google.com/favicon.ico')">Google</button>
+          <button class="s-pre" onclick="setFaviconPreset('https://ssl.gstatic.com/classroom/favicon.png','https://ssl.gstatic.com/classroom/favicon.png')">Classroom</button>
+          <button class="s-pre" onclick="setFaviconPreset('https://www.gstatic.com/images/branding/product/1x/docs_2020q4_32dp.png','https://www.gstatic.com/images/branding/product/1x/docs_2020q4_32dp.png')">Docs</button>
+          <button class="s-pre" onclick="setFaviconPreset('https://www.khanacademy.org/favicon.ico','https://www.khanacademy.org/favicon.ico')">Khan</button>
+          <button class="s-pre" onclick="setFaviconPreset('https://quizlet.com/favicon.ico','https://quizlet.com/favicon.ico')">Quizlet</button>
+          <button class="s-pre" onclick="setFaviconPreset('https://www.youtube.com/favicon.ico','https://www.youtube.com/favicon.ico')">YouTube</button>
         </div>
       </div>
       <div>
@@ -854,8 +891,10 @@ function openSettings() { document.getElementById('settings-panel').classList.ad
 function closeSettings() { document.getElementById('settings-panel').classList.remove('open'); }
 function applySettings() {
   const title = document.getElementById('s-tab-title').value.trim() || 'Google Classroom';
+  const favicon = document.getElementById('s-favicon').value.trim();
   document.title = title;
-  localStorage.setItem('mgs-settings', JSON.stringify({ title }));
+  if (favicon) applyFavicon(favicon);
+  localStorage.setItem('mgs-settings', JSON.stringify({ title, favicon }));
   showToast('Settings saved!');
   closeSettings();
 }
@@ -863,8 +902,25 @@ function loadSettings() {
   try {
     const s = JSON.parse(localStorage.getItem('mgs-settings') || '{}');
     if (s.title) { document.getElementById('s-tab-title').value = s.title; document.title = s.title; }
+    if (s.favicon) { document.getElementById('s-favicon').value = s.favicon; applyFavicon(s.favicon); }
   } catch(e) {}
 }
+function applyFavicon(url) {
+  let link = document.querySelector("link[rel~='icon']");
+  if (!link) { link = document.createElement('link'); link.rel = 'icon'; document.head.appendChild(link); }
+  link.href = url;
+}
+function setFaviconPreset(url, display) {
+  document.getElementById('s-favicon').value = url;
+  applyFavicon(url);
+  showToast('Favicon updated!');
+}
+
+// Tab close confirmation
+window.addEventListener('beforeunload', e => {
+  e.preventDefault();
+  e.returnValue = '';
+});
 
 // Panic key
 document.addEventListener('keydown', e => {
